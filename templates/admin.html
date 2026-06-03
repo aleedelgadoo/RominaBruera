@@ -1,0 +1,1501 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+    body { background-color: #f4f6f8; }
+    .admin-title { font-size: 1.8rem; font-weight: 800; color: #2c3e50; }
+    
+    /* Pestañas grandes y claras */
+    .nav-pills .nav-link {
+        border-radius: 10px;
+        color: #495057;
+        font-weight: 600;
+        padding: 12px 20px;
+        margin-right: 8px;
+        background: #e9ecef;
+        transition: all 0.2s;
+    }
+    .nav-pills .nav-link.active {
+        background-color: #2c3e50;
+        color: white;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+    
+    /* Tarjetas contenedoras */
+    .friendly-card {
+        background: white;
+        border-radius: 15px;
+        border: none;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        padding: 30px;
+        margin-bottom: 30px;
+    }
+    .friendly-card-header {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #2c3e50;
+        border-bottom: 2px solid #f1f1f1;
+        padding-bottom: 15px;
+        margin-bottom: 20px;
+    }
+    
+    /* Textos de ayuda (Guías) */
+    .help-box {
+        background-color: #e8f4fd;
+        border-left: 4px solid #3498db;
+        padding: 15px;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        color: #2980b9;
+        margin-bottom: 20px;
+    }
+    .helper-text { font-size: 0.85rem; color: #7f8c8d; margin-top: 4px; display: block; }
+    
+    /* Inputs y Botones grandes */
+    .form-control, .form-select {
+        border-radius: 8px;
+        padding: 10px 15px;
+        border: 1px solid #ced4da;
+    }
+    .btn-action {
+        border-radius: 8px;
+        padding: 10px 24px;
+        font-weight: 600;
+    }
+    
+    /* Jerarquías (Subservicios y paquetes) */
+    .sub-box {
+        background-color: #fafbfc;
+        border: 1px solid #e1e4e8;
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 15px;
+    }
+    .sub-box-title { font-weight: 700; color: #34495e; font-size: 1.1rem; }
+    
+    label { font-weight: 600; color: #34495e; margin-bottom: 5px; }
+</style>
+
+<div class="container py-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+        <div>
+            <h1 class="admin-title m-0">👋 Hola, bienvenido al Panel</h1>
+            <p class="text-muted m-0 mt-1">Desde aquí podés modificar toda la información de tu página web de forma sencilla.</p>
+        </div>
+        <div class="mt-3 mt-md-0">
+            <a href="{{ url_for('inicio') }}" class="btn btn-outline-dark btn-action" target="_blank">👁 Ver mi página web</a>
+        </div>
+    </div>
+
+    <ul class="nav nav-pills mb-4 overflow-auto flex-nowrap pb-2" id="adminTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-general" type="button">1. Mi Página (Inicio)</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-servicios" type="button">2. Mis Servicios</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-cursos" type="button">3. Mis Cursos</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-clientes" type="button">4. Reseñas y Dudas</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-fotos" type="button">5. Galería de Fotos</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-trayectoria" type="button">6. Mi Trayectoria</button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="adminTabsContent">
+
+        <div class="tab-pane fade show active" id="tab-general" role="tabpanel">
+            <form action="{{ url_for('actualizar_configuracion_global') }}" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
+                <div class="friendly-card">
+                    <h2 class="friendly-card-header">✏️ Textos y Enlaces Principales</h2>
+                    <div class="help-box">
+                        Aquí defines el nombre de tu marca y a dónde va la gente cuando hace click en "Reservar Turno" o en tus redes sociales.
+                    </div>
+                    
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label>Nombre de tu Marca o Negocio</label>
+                            <input type="text" name="titulo_sitio" class="form-control" value="{{ global_config.titulo_sitio if global_config else 'TIARA BEAUTY' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label>Link / Enlace para Reservar Turnos</label>
+                            <span class="helper-text">Puede ser el link de tu WhatsApp o de tu sistema de turnos.</span>
+                            <input type="url" name="link_turno" class="form-control" value="{{ global_config.link_turno if global_config else '#' }}">
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <label>Link de tu WhatsApp</label>
+                            <input type="url" name="link_whatsapp" class="form-control" value="{{ global_config.link_whatsapp }}" placeholder="Ej: https://wa.me/...">
+                        </div>
+                        <div class="col-md-4">
+                            <label>Link de tu Instagram</label>
+                            <input type="url" name="link_instagram" class="form-control" value="{{ global_config.link_instagram }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label>Link de tu TikTok</label>
+                            <input type="url" name="link_tiktok" class="form-control" value="{{ global_config.link_tiktok }}">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="friendly-card">
+                    <h2 class="friendly-card-header">🖼️ Fotos Principales (Tu Vidriera)</h2>
+                    
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label>Logo de tu marca</label>
+                            <span class="helper-text">Elegí una imagen para que aparezca arriba de todo en tu web.</span>
+                            <input type="file" name="logo_sitio" class="form-control">
+                            {% if global_config and global_config.logo %}
+                                <div class="mt-2 p-2 border rounded d-inline-block bg-light"><img src="{{ global_config.logo }}" style="max-height: 40px;"></div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label>Foto tuya (Sección "Sobre Mí")</label>
+                            <span class="helper-text">Una foto tuya trabajando o de presentación.</span>
+                            <input type="file" name="foto_sobre_mi" class="form-control">
+                            {% if global_config and global_config.imagen_sobre_mi %}
+                                <img src="{{ global_config.imagen_sobre_mi }}" class="img-thumbnail mt-2" style="max-height: 60px;">
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+                    <p class="fw-bold mb-3">Las 3 fotos grandes que aparecen apenas entrás a tu página:</p>
+                    
+                    <div class="row g-3 bg-light p-3 rounded">
+                        <div class="col-md-4">
+                            <label>Foto Izquierda</label>
+                            <input type="file" name="imagen_inicio_1" class="form-control">
+                            {% if global_config and global_config.imagen_inicio_1 %}<img src="{{ global_config.imagen_inicio_1 }}" class="img-thumbnail mt-2" style="height: 50px;">{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label>Foto Central (La más importante)</label>
+                            <input type="file" name="imagen_hero" id="inputImagenHero" class="form-control">
+                            {% if global_config and global_config.imagen_hero %}<img src="{{ global_config.imagen_hero }}" class="img-thumbnail mt-2" style="height: 50px;">{% endif %}
+                            
+                            <label class="mt-3">Acomodar foto central: <span id="labelFoco">Mover arriba/abajo</span></label>
+                            <input type="range" name="posicion_foco_hero" id="rangeHero" class="form-range" min="0" max="100" value="{{ global_config.posicion_foco_hero.replace('%','') if global_config.posicion_foco_hero else '50' }}">
+                            <div id="preview-box" style="width: 100%; height: 100px; background-color: #ddd; background-size: cover; background-repeat: no-repeat; border-radius: 4px; {% if global_config and global_config.imagen_hero %}background-image: url('{{ global_config.imagen_hero }}'); background-position: center {{ global_config.posicion_foco_hero if global_config.posicion_foco_hero else '50%' }};{% endif %}"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <label>Foto Derecha</label>
+                            <input type="file" name="imagen_inicio_3" class="form-control">
+                            {% if global_config and global_config.imagen_inicio_3 %}<img src="{{ global_config.imagen_inicio_3 }}" class="img-thumbnail mt-2" style="height: 50px;">{% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="friendly-card">
+                    <h2 class="friendly-card-header">🏷️ Nombres del Menú</h2>
+                    <div class="help-box">¿Cómo querés que se llamen las secciones en el menú de navegación de tu web?</div>
+                    <div class="row g-3">
+                        <div class="col-md-2 col-6"><label>Inicio</label><input type="text" name="sec_home" class="form-control" value="{{ global_config.sec_home }}"></div>
+                        <div class="col-md-2 col-6"><label>Sobre Mí</label><input type="text" name="sec_about" class="form-control" value="{{ global_config.sec_about }}"></div>
+                        <div class="col-md-2 col-6"><label>Servicios</label><input type="text" name="sec_servicios" class="form-control" value="{{ global_config.sec_servicios }}"></div>
+                        <div class="col-md-2 col-6"><label>Cursos</label><input type="text" name="sec_cursos" class="form-control" value="{{ global_config.sec_cursos }}"></div>
+                        <div class="col-md-2 col-6"><label>Testimonios</label><input type="text" name="sec_testimonios" class="form-control" value="{{ global_config.sec_testimonios }}"></div>
+                        <div class="col-md-2 col-6"><label>Preguntas</label><input type="text" name="sec_faq" class="form-control" value="{{ global_config.sec_faq }}"></div>
+                    </div>
+                </div>
+
+                <p class="small text-muted text-center mt-2">💾 Los cambios de esta sección se guardan con el botón flotante</p>
+            </form>
+        </div>
+
+        <div class="tab-pane fade" id="tab-servicios" role="tabpanel">
+            
+            <div class="friendly-card" style="background-color: #2c3e50; color: white;">
+                <h2 class="friendly-card-header text-white border-secondary">✨ Agregar un Servicio Nuevo</h2>
+                <p class="mb-3">Aquí creas la categoría principal (Por ejemplo: "Maquillaje Social" o "Peluquería").</p>
+                <button class="btn btn-light btn-action" type="button" data-bs-toggle="collapse" data-bs-target="#nuevoServicioDiv">
+                    + Toca aquí para crear el servicio
+                </button>
+                
+                <div class="collapse mt-4" id="nuevoServicioDiv">
+                    <form action="{{ url_for('nuevo_servicio') }}" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="row g-3">
+        <div class="col-md-6">
+            <label class="text-white">Nombre del Servicio</label>
+            <input type="text" name="tipo" class="form-control bg-dark text-white border-secondary" required placeholder="Ej: Maquillaje Social">
+        </div>
+        
+        <div class="col-md-6">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" name="mostrar_duracion" checked>
+                <label class="text-white">Mostrar tiempo</label>
+            </div>
+            <div class="duracion-input-container">
+                <input type="text" name="duracion" class="form-control bg-dark text-white border-secondary" placeholder="Ej: 1h 25min">
+            </div>
+        </div>
+
+        <div class="col-12">
+            <label class="text-white">Descripción</label>
+            <textarea name="incluye" class="form-control bg-dark text-white border-secondary" rows="2"></textarea>
+        </div>
+
+        <div class="col-12">
+            <label class="text-white">Foto principal del servicio</label>
+            <span class="helper-text" style="color:#adb5bd">La imagen que aparecerá en la página de detalle del servicio.</span>
+            <input type="file" name="imagen_principal" class="form-control bg-dark text-white border-secondary" accept="image/*">
+        </div>
+        
+        <div class="col-12">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" name="mostrar_precio">
+                <label class="text-white">Mostrar precios</label>
+            </div>
+            <p class="small mt-1 mb-0" style="color:#adb5bd">📌 Los precios detallados se agregan después de crear el servicio.</p>
+        </div>
+    </div>
+    <div class="mt-3">
+        <button type="submit" class="btn btn-light btn-action fw-bold">Crear Servicio</button>
+    </div>
+</form>
+                </div>
+            </div>
+
+            <h3 class="mb-3 text-secondary fw-bold">👇 Servicios que ya tenés creados:</h3>
+            
+            <div class="accordion" id="acordeonServicios">
+                {% for s in servicios %}
+                <div class="accordion-item border-0 friendly-card p-0 mb-4 overflow-hidden">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed fw-bold fs-4 text-dark bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#verServ_{{ s.id }}">
+                            💇‍♀️ {{ s.tipo }}
+                        </button>
+                    </h2>
+                    
+                    <div id="verServ_{{ s.id }}" class="accordion-collapse collapse" data-bs-parent="#acordeonServicios">
+                        <div class="accordion-body p-4 bg-light">
+                            
+                            <div class="bg-white p-4 rounded shadow-sm mb-4 border-start border-4 border-dark">
+                                <h4 class="fw-bold mb-3 border-bottom pb-2">📝 1. Modificar datos de "{{ s.tipo }}"</h4>
+                              <form action="{{ url_for('editar_servicio', id=s.id) }}" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="row g-3">
+        <div class="col-md-6"><label>Nombre</label><input type="text" name="tipo" class="form-control" value="{{ s.tipo }}"></div>
+        
+        <div class="col-md-6">
+            <div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="mostrar_duracion" {% if s.mostrar_duracion %}checked{% endif %}> <label>Mostrar tiempo</label></div>
+            <div class="duracion-input-container"><input type="text" name="duracion" class="form-control" value="{{ s.duracion }}"></div>
+        </div>
+
+        <div class="col-12"><label>Descripción</label><textarea name="incluye" class="form-control">{{ s.incluye }}</textarea></div>
+
+        <div class="col-12">
+            <label>Foto principal del servicio</label>
+            {% if s.imagen_principal %}
+                <div class="mb-1"><img src="{{ s.imagen_principal }}" style="height:50px; border-radius:4px;"></div>
+            {% endif %}
+            <input type="file" name="imagen_principal" class="form-control" accept="image/*">
+        </div>
+        
+        <div class="col-12">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" name="mostrar_precio" id="check-precio-serv-{{ s.id }}" {% if s.mostrar_precio %}checked{% endif %} onchange="togglePreciosServ({{ s.id }})">
+                <label>Mostrar precios</label>
+            </div>
+        </div>
+    </div>
+    <p class="small text-muted mt-3 mb-0">💾 Los cambios se guardan con el botón flotante</p>
+</form>
+
+                                <!-- Tabla de Precios del Servicio (igual al subservicio) -->
+                                <div id="seccion-precios-serv-{{ s.id }}" {% if not s.mostrar_precio %}style="display:none"{% endif %} class="mt-3">
+                                    <div class="bg-light p-3 border rounded">
+                                        <h6 class="fw-bold text-success">💰 Tabla de Precios de "{{ s.tipo }}"</h6>
+                                        <span class="helper-text mb-2">Ej: "Con prueba", "A domicilio", etc.</span>
+                                        <select id="tipo-precio-serv-{{ s.id }}" class="form-select form-select-sm mb-2" onchange="toggleCamposPrecioServ({{ s.id }})">
+                                            <option value="base" {% if s.tipo_precio == 'base' %}selected{% endif %}>Precio Fijo</option>
+                                            <option value="rango" {% if s.tipo_precio == 'rango' %}selected{% endif %}>Rango (Desde/Hasta)</option>
+                                        </select>
+                                        <!-- Campos Precio Fijo -->
+                                        <div id="campo-fijo-serv-{{ s.id }}" class="d-flex gap-1 mb-3">
+                                            <input type="text" id="new-precio-serv-desc-{{ s.id }}" class="form-control form-control-sm" placeholder="Etiqueta (Ej: A domicilio)">
+                                            <input type="text" id="new-precio-serv-val-{{ s.id }}" class="form-control form-control-sm w-25" placeholder="$$">
+                                            <button type="button" class="btn btn-success btn-sm" onclick="agregarPrecioServTemp({{ s.id }})">+</button>
+                                        </div>
+                                        <!-- Campos Precio Rango -->
+                                        <div id="campo-rango-serv-{{ s.id }}" class="d-flex gap-1 mb-3" style="display:none !important">
+                                            <input type="text" id="new-precio-serv-desc-rango-{{ s.id }}" class="form-control form-control-sm" placeholder="Etiqueta">
+                                            <input type="text" id="new-precio-serv-desde-{{ s.id }}" class="form-control form-control-sm w-25" placeholder="Desde">
+                                            <input type="text" id="new-precio-serv-hasta-{{ s.id }}" class="form-control form-control-sm w-25" placeholder="Hasta">
+                                            <button type="button" class="btn btn-success btn-sm" onclick="agregarPrecioServTemp({{ s.id }})">+</button>
+                                        </div>
+                                        <ul class="list-group list-group-flush" id="lista-precios-serv-{{ s.id }}">
+                                            {% for pr in s.precios %}
+                                            <li class="list-group-item d-flex justify-content-between p-1 small">
+                                                <span>{{ pr.descripcion if pr.descripcion else 'General' }}:
+                                                    {% if pr.precio_desde %}
+                                                        <b>${{ pr.precio_desde }} - ${{ pr.precio_hasta }}</b>
+                                                    {% else %}
+                                                        <b>${{ pr.precio_base }}</b>
+                                                    {% endif %}
+                                                </span>
+                                                <a href="{{ url_for('eliminar_precio_servicio', id=pr.id) }}" class="text-danger fw-bold text-decoration-none">x</a>
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                        <div id="pending-precios-serv-{{ s.id }}" data-servid="{{ s.id }}"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-white p-4 rounded shadow-sm border-start border-4 border-primary mb-4">
+                                <h4 class="fw-bold mb-2 text-primary">🏷️ 2. Tipos y Opciones de este servicio</h4>
+                                <div class="help-box mb-3">
+                                    Acá creás las "Variantes". Por ejemplo, si el servicio es "Uñas", las variantes pueden ser "Acrílicas", "Semipermanente", etc. Cada variante puede tener su propia foto y diferentes precios.
+                                </div>
+                                
+                                <button class="btn btn-outline-primary btn-sm mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#nuevoSubservicioDiv_{{ s.id }}">
+                                    ➕ Toca aquí para crear una opción / subservicio
+                                </button>
+                                
+                                <div class="collapse mb-4" id="nuevoSubservicioDiv_{{ s.id }}">
+                                    <form action="{{ url_for('nuevo_subservicio') }}" method="POST" enctype="multipart/form-data" class="bg-light p-3 rounded border m-0">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <input type="hidden" name="servicio_id" value="{{ s.id }}">
+                                        <p class="fw-bold mb-2">+ Agregar una nueva opción a "{{ s.tipo }}"</p>
+                                        <div class="row g-2">
+                                            <div class="col-md-6"><input type="text" name="nombre" class="form-control" placeholder="Nombre de la opción..." required></div>
+                                            <div class="col-md-6"><input type="text" name="duracion" class="form-control" placeholder="Demora (Opcional)"></div>
+                                            <div class="col-12"><textarea name="descripcion" class="form-control" rows="1" placeholder="Descripción breve..." required></textarea></div>
+                                            <div class="col-12">
+                                                <label class="helper-text">Sube una foto exclusiva para esta opción:</label>
+                                                <input type="file" name="imagen_principal" class="form-control form-control-sm">
+                                            </div>
+                                            <div class="col-12 mt-2 text-end"><button type="submit" class="btn btn-primary btn-sm px-4">Agregar Opción</button></div>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                {% if s.subservicios %}
+                                <p class="fw-bold text-secondary">Opciones ya creadas:</p>
+                                <div class="row g-3">
+                                    {% for sub in s.subservicios %}
+                                    <div class="col-12">
+                                        <div class="sub-box m-0">
+                                            <div class="d-flex justify-content-between align-items-center mb-2 border-bottom pb-2">
+
+    <!-- Título correcto del subservicio -->
+    <div>
+        <div class="sub-box-title">
+            {{ sub.nombre }}
+        </div>
+
+        {% if sub.duracion %}
+        <small class="text-muted">
+            ⏱ {{ sub.duracion }}
+        </small>
+        {% endif %}
+    </div>
+
+    <!-- Botones originales -->
+    <div>
+        <button
+            class="btn btn-sm btn-outline-dark"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#editSub_{{ sub.id }}">
+            Configurar esta opción
+        </button>
+
+        <a href="{{ url_for('eliminar_subservicio', id=sub.id) }}"
+           class="btn btn-sm btn-danger px-2 ms-1"
+           onclick="return confirm('¿Borrar esta opción?')">
+            🗑
+        </a>
+    </div>
+
+</div>
+
+                                            <div class="collapse" id="editSub_{{ sub.id }}">
+                                                <div class="pt-3">
+                                                    <form action="{{ url_for('editar_subservicio', id=sub.id) }}" method="POST" enctype="multipart/form-data" class="mb-4 bg-white p-3 border rounded">
+                                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                        <p class="fw-bold mb-2">Editar textos de la opción:</p>
+                                                        <div class="row g-2 mb-2">
+                                                            <div class="col-md-6"><input type="text" name="nombre" class="form-control form-control-sm" value="{{ sub.nombre }}"></div>
+<div class="col-md-6">
+
+    <div class="form-check form-switch mb-2">
+        <input class="form-check-input"
+               type="checkbox"
+               name="mostrar_duracion"
+               id="sub_mostrar_duracion_{{ sub.id }}"
+               {% if sub.mostrar_duracion %}checked{% endif %}>
+
+        <label class="form-check-label"
+               for="sub_mostrar_duracion_{{ sub.id }}">
+            Mostrar duración
+        </label>
+    </div>
+
+    <input type="text"
+           name="duracion"
+           class="form-control form-control-sm"
+           value="{{ sub.duracion }}"
+           placeholder="Ej: 1h 30min">
+</div>
+<div class="col-12"><textarea name="descripcion" class="form-control form-control-sm" rows="1">{{ sub.descripcion }}</textarea></div>
+                                                        <div class="col-md-6 d-flex align-items-center">
+                                                                <!-- Mantenemos el input oculto para no romper el sistema de staging ni el envío de datos -->
+                                                                <input type="checkbox" name="mostrar_precio" id="check-precio-{{ sub.id }}" {% if sub.mostrar_precio %}checked{% endif %} class="d-none">
+                                                                <!-- Único botón interactivo visible -->
+                                                                <button type="button" class="btn btn-sm btn-outline-success fw-bold w-100" onclick="togglePreciosSub({{ sub.id }})">
+                                                                    💰 Mostrar tabla de precios
+                                                                </button>
+                                                            </div>
+                                                            <div class="col-12">
+                                                                <label class="helper-text m-0">Cambiar Foto de esta opción:</label>
+                                                                <input type="file" name="imagen_principal" class="form-control form-control-sm">
+                                                            </div>
+                                                        </div>
+                                                        <p class="small text-muted mt-2 mb-0">💾 Los cambios se guardan con el botón flotante</p>
+                                                    </form>
+
+                                                    <div class="row g-3">
+                                                        <!-- Columna de Precios: Única afectada por el ID colapsable -->
+                                                        <div class="col-md-6" id="seccion-precios-{{ sub.id }}" {% if not sub.mostrar_precio %}style="display:none"{% endif %}>
+                                                            <div class="bg-white p-3 border rounded h-100">
+                                                                <h6 class="fw-bold text-success">💰 Precios de "{{ sub.nombre }}"</h6>
+                                                                <span class="helper-text mb-2">Ej: "Con prueba", "A domicilio", etc.</span>
+                                                                <!-- Formulario de staging: el + agrega visualmente, guarda con el botón flotante -->
+                                                                <div class="d-flex gap-1 mb-3">
+                                                                    <input type="text" id="new-precio-desc-{{ sub.id }}" class="form-control form-control-sm" placeholder="Etiqueta">
+                                                                    <input type="text" id="new-precio-val-{{ sub.id }}" class="form-control form-control-sm w-25" placeholder="$$">
+                                                                    <button type="button" class="btn btn-success btn-sm" onclick="agregarPrecioTemp({{ sub.id }})">+</button>
+                                                                </div>
+                                                                <ul class="list-group list-group-flush" id="lista-precios-{{ sub.id }}">
+                                                                    {% for pr in sub.precios %}
+                                                                    <li class="list-group-item d-flex justify-content-between p-1 small">
+                                                                        <span>{{ pr.descripcion }}: <b>${{ pr.precio_base }}</b></span>
+                                                                        <a href="{{ url_for('eliminar_precio_subservicio', id=pr.id) }}" class="text-danger fw-bold text-decoration-none">x</a>
+                                                                    </li>
+                                                                    {% endfor %}
+                                                                </ul>
+                                                                <!-- Contenedor oculto donde se acumulan los precios nuevos pendientes de guardar -->
+                                                                <div id="pending-precios-{{ sub.id }}" data-subid="{{ sub.id }}"></div>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <!-- Columna de Galería: Ubicada por fuera del contenedor condicional, siempre visible -->
+                                                        <div class="col-md-6">
+                                                            <div class="bg-white p-3 border rounded h-100">
+                                                                <h6 class="fw-bold text-info">📸 Galería de "{{ sub.nombre }}"</h6>
+                                                                <span class="helper-text mb-2">Añade fotos de ejemplos de este trabajo.</span>
+                                                                <form action="{{ url_for('subir_foto_subservicio', id=sub.id) }}" method="POST" enctype="multipart/form-data" class="d-flex gap-1 mb-2">
+                                                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                                    <input type="file" name="fotos_galeria" multiple class="form-control form-control-sm" required>
+                                                                    <button type="submit" class="btn btn-info btn-sm text-white">Subir</button>
+                                                                </form>
+                                                                <div class="d-flex flex-wrap gap-2">
+                                                                    {% for f in sub.fotos %}
+                                                                    <div class="position-relative" style="width: 50px; height: 50px; cursor:pointer;" onclick="abrirPreviewFoto('{{ f.ruta }}', {{ f.id }}, '{{ f.posicion_foco|replace('%','') if f.posicion_foco else '50' }}', 'modal-preview-s{{ s.id }}')">
+                                                                        <img src="{{ f.ruta }}" class="w-100 h-100 object-fit-cover rounded border" style="object-position: center {{ f.posicion_foco if f.posicion_foco else '50%' }};">
+                                                                        <a href="{{ url_for('eliminar_foto_servicio', foto_id=f.id) }}" class="position-absolute top-0 end-0 bg-danger text-white rounded-circle d-flex align-items-center justify-content-center text-decoration-none" style="width:15px; height:15px; font-size:10px; margin:-5px -5px 0 0;" onclick="event.stopPropagation(); return confirm('¿Borrar?')">x</a>
+                                                                    </div>
+                                                                    {% endfor %}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>{# /row g-3 precios+galeria #}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="bg-white p-4 rounded shadow-sm border-start border-4 border-warning">
+                                <h4 class="fw-bold mb-2 text-warning">🎁 3. Paquetes o Promociones</h4>
+                                <div class="help-box mb-3 bg-light border-warning text-dark">
+                                    Si ofrecés combos que incluyan este servicio (Ej: "Pack Novia Completo"), anotalos acá.
+                                </div>
+                                <!-- Staging paquetes: se agregan visualmente y se envían al guardar todo -->
+                                <div class="d-flex gap-2 mb-3">
+                                    <input type="text" id="new-paq-nom-{{ s.id }}" class="form-control" placeholder="Nombre de la Promo">
+                                    <input type="text" id="new-paq-desc-{{ s.id }}" class="form-control" placeholder="Qué incluye...">
+                                    <button type="button" class="btn btn-warning fw-bold" onclick="agregarPaqueteTemp({{ s.id }})">Agregar</button>
+                                </div>
+                                <!-- Paquetes pendientes (aún no guardados) -->
+                                <ul class="list-group mb-2" id="lista-paquetes-temp-{{ s.id }}"></ul>
+                                <ul class="list-group">
+                                    {% for p in s.paquetes %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center bg-light">
+                                        <div><b>{{ p.nombre }}</b> - <span class="text-muted">{{ p.descripcion }}</span></div>
+                                        <a href="{{ url_for('eliminar_paquete', id=p.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('¿Borrar promo?')">🗑</a>
+                                    </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+
+                            <div id="modal-preview-s{{ s.id }}" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:9999; align-items:center; justify-content:center;">
+                                <div class="bg-white p-4 rounded" style="width: 320px; max-width: 90%;">
+                                    <h5 class="fw-bold border-bottom pb-2 mb-3 text-center">Acomodar Foto de Galería</h5>
+                                    <p class="small text-muted text-center">Movela para que lo importante no se corte.</p>
+                                    <div class="mb-3 mx-auto" style="width:160px; height:200px; background:#eee; border-radius:8px; overflow:hidden;">
+                                        <img id="img-modal-s{{ s.id }}" src="" style="width:100%; height:100%; object-fit:cover;">
+                                    </div>
+                                    <label class="small fw-bold">↕️ Arriba / Abajo</label>
+                                    <input type="range" min="0" max="100" value="50" class="form-range mb-2" id="range-v-s{{ s.id }}" oninput="ajustarFocalModal('img-modal-s{{ s.id }}', document.getElementById('range-h-s{{ s.id }}').value, this.value)">
+                                    <label class="small fw-bold">↔️ Izq. / Derecha</label>
+                                    <input type="range" min="0" max="100" value="50" class="form-range mb-3" id="range-h-s{{ s.id }}" oninput="ajustarFocalModal('img-modal-s{{ s.id }}', this.value, document.getElementById('range-v-s{{ s.id }}').value)">
+                                    
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-secondary w-50" onclick="cerrarPreviewModal('modal-preview-s{{ s.id }}')">Cancelar</button>
+                                        <button class="btn btn-success w-50 fw-bold" onclick="guardarYCerrarFoco('modal-preview-s{{ s.id }}', 'range-v-s{{ s.id }}', 'range-h-s{{ s.id }}')">Guardar</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="tab-cursos" role="tabpanel">
+            <div class="friendly-card">
+                <h2 class="friendly-card-header">🎓 Agregar un Curso Nuevo</h2>
+                <div class="help-box">Si das clases, capacitaciones o cursos, agregalos llenando este formulario simple.</div>
+                
+                <form action="{{ url_for('nuevo_curso') }}" method="POST" enctype="multipart/form-data" class="bg-light p-4 border rounded">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="row g-3">
+                        <div class="col-md-6"><label>Título del Curso</label><input type="text" name="nombre" class="form-control" placeholder="Ej: Automaquillaje Intensivo" required></div>
+                        <div class="col-md-6"><label>Duración</label><input type="text" name="duracion" class="form-control" placeholder="Ej: 4 Clases" required></div>
+                        <div class="col-12"><label>Descripción / Temario</label><textarea name="descripcion" class="form-control" rows="2" required></textarea></div>
+                        <div class="col-12"><label>Modalidad (Online, Presencial, etc.)</label><input type="text" name="modalidad" class="form-control"></div>
+                        <div class="col-md-6"><div class="form-check form-switch mt-2"><input class="form-check-input" type="checkbox" name="mostrar_modalidad" checked><label class="form-check-label ms-2">Mostrar la modalidad en la web</label></div></div>
+                        <div class="col-12"><label>Sube la foto del curso</label><input type="file" name="imagen_principal" class="form-control" required></div>
+                    </div>
+                    <button type="submit" class="btn btn-dark btn-action mt-4">Guardar Nuevo Curso</button>
+                </form>
+            </div>
+
+            {% if cursos %}
+            <h3 class="mb-3 text-secondary fw-bold">Tus Cursos Guardados:</h3>
+            <div class="row g-4">
+                {% for c in cursos %}
+                <div class="col-md-6">
+                    <div class="friendly-card h-100 p-4 border-start border-4 border-info shadow-sm">
+                        <h4 class="fw-bold mb-3 border-bottom pb-2 text-info">{{ c.nombre }}</h4>
+                        <form action="{{ url_for('editar_curso', id=c.id) }}" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="row g-2 mb-3">
+                                <div class="col-12"><label class="small">Nombre</label><input type="text" name="nombre" class="form-control form-control-sm" value="{{ c.nombre }}" required></div>
+                                <div class="col-12"><label class="small">Duración</label><input type="text" name="duracion" class="form-control form-control-sm" value="{{ c.duracion }}" required></div>
+                                <div class="col-12"><label class="small">Descripción</label><textarea name="descripcion" class="form-control form-control-sm" rows="2" required>{{ c.descripcion }}</textarea></div>
+                                <div class="col-12"><label class="small">Modalidad</label><input type="text" name="modalidad" class="form-control form-control-sm" value="{{ c.modalidad }}"></div>
+                                <div class="col-12"><div class="form-check form-switch"><input class="form-check-input" type="checkbox" name="mostrar_modalidad" {% if c.mostrar_modalidad %}checked{% endif %}><label class="small form-check-label ms-1">Ver modalidad</label></div></div>
+                                <div class="col-12 mt-2">
+                                    <label class="small">Cambiar Foto Principal</label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <img src="{{ c.imagen_principal }}" class="rounded" style="width:40px; height:40px; object-fit:cover;">
+                                        <input type="file" name="imagen_principal" class="form-control form-control-sm">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-3">
+                                <p class="small text-muted mb-0">💾 Se guarda con el botón flotante</p>
+                                <a href="{{ url_for('eliminar_curso', id=c.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Borrar curso?')">Borrar</a>
+                            </div>
+                        </form>
+                        
+                        <hr class="my-3">
+                        <label class="small fw-bold text-info">📸 Galería de fotos del curso</label>
+                        <form action="{{ url_for('subir_foto_curso', id=c.id) }}" method="POST" enctype="multipart/form-data" class="d-flex gap-1 mt-1 mb-2">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="file" name="fotos_galeria" multiple class="form-control form-control-sm" required>
+                            <button type="submit" class="btn btn-success btn-sm">Subir</button>
+                        </form>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for f in c.fotos %}
+                            <div class="position-relative" style="width: 40px; height: 40px;">
+                                <img src="{{ f.ruta }}" class="w-100 h-100 object-fit-cover rounded border">
+                                <a href="{{ url_for('eliminar_foto_curso', foto_id=f.id) }}" class="position-absolute top-0 end-0 bg-danger text-white rounded-circle d-flex align-items-center justify-content-center text-decoration-none" style="width:14px; height:14px; font-size:9px; margin:-5px -5px 0 0;" onclick="return confirm('¿Borrar foto?')">x</a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="tab-pane fade" id="tab-clientes" role="tabpanel">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="friendly-card h-100">
+                        <h2 class="friendly-card-header text-success">⭐ Lo que dicen tus clientes</h2>
+                        <div class="help-box bg-light border-success text-dark mb-4">Sube comentarios lindos que te dejen tus clientas. Dará mucha confianza a quienes entren a tu web.</div>
+                        
+                        <div class="bg-light p-3 border rounded mb-4">
+                            <div class="mb-2"><label class="small">Nombre de la clienta</label><input type="text" id="exp-nombre" class="form-control form-control-sm" placeholder="Ej: María González"></div>
+                            <div class="mb-2"><label class="small">El comentario</label><textarea id="exp-testimonio" class="form-control form-control-sm" rows="2" placeholder="Qué dijo de vos..."></textarea></div>
+                            <div class="mb-3"><label class="small">Una foto de ella (o un icono)</label><input type="file" id="exp-foto" class="form-control form-control-sm" accept="image/*"></div>
+                            <button type="button" class="btn btn-success btn-sm fw-bold w-100" onclick="agregarExpTemp()">➕ Agregar a la lista (se guarda con el botón flotante)</button>
+                        </div>
+                        <!-- Lista de testimonios pendientes -->
+                        <ul class="list-group mb-3" id="lista-exp-pendientes"></ul>
+
+                        <div class="list-group">
+                            {% for exp in experiencias %}
+                            <div class="list-group-item d-flex align-items-center p-2 mb-2 border rounded shadow-sm">
+                                <img src="{{ exp.foto_perfil }}" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;">
+                                <div class="flex-grow-1">
+                                    <strong class="d-block lh-1">{{ exp.nombre }}</strong>
+                                    <small class="text-muted text-truncate d-inline-block" style="max-width: 150px;">{{ exp.testimonio }}</small>
+                                </div>
+                                <a href="{{ url_for('eliminar_experiencia', id=exp.id) }}" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="return confirm('¿Eliminar?')">x</a>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="friendly-card h-100">
+                        <h2 class="friendly-card-header text-primary">❓ Preguntas Frecuentes</h2>
+                        <div class="help-box bg-light border-primary text-dark mb-4">Anotá acá esas preguntas que te hacen siempre por WhatsApp (Ej: "¿Dónde estás ubicada?", "¿Aceptas tarjeta?").</div>
+                        
+                        <div class="bg-light p-3 border rounded mb-4">
+                            <div class="mb-2"><label class="small">La Pregunta</label><input type="text" id="faq-pregunta" class="form-control form-control-sm" placeholder="Ej: ¿Trabajás a domicilio?"></div>
+                            <div class="mb-3"><label class="small">Tu Respuesta</label><textarea id="faq-respuesta" class="form-control form-control-sm" rows="2" placeholder="Sí, dependiendo la zona..."></textarea></div>
+                            <button type="button" class="btn btn-primary btn-sm fw-bold w-100" onclick="agregarFaqTemp()">➕ Agregar a la lista (se guarda con el botón flotante)</button>
+                        </div>
+                        <!-- Lista de FAQs pendientes -->
+                        <ul class="list-group mb-3" id="lista-faq-pendientes"></ul>
+
+                        <ul class="list-group">
+                            {% for faq in faqs %}
+                            <li class="list-group-item d-flex justify-content-between align-items-start p-2 mb-2 border rounded shadow-sm">
+                                <div><b class="small d-block text-dark">{{ faq.pregunta }}</b><small class="text-muted">{{ faq.respuesta }}</small></div>
+                                <a href="{{ url_for('eliminar_faq', id=faq.id) }}" class="text-danger ms-2 fw-bold text-decoration-none" onclick="return confirm('¿Eliminar?')">x</a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="tab-fotos" role="tabpanel">
+            <div class="friendly-card">
+                <h2 class="friendly-card-header">📸 Álbum de Fotos General de tu Trabajo</h2>
+                <div class="help-box mb-4">
+                    Podés seleccionar varias fotos a la vez desde tu celular o compu y se subirán todas juntas a la sección de "Portfolio" de tu página de inicio.
+                </div>
+                
+                <form action="{{ url_for('subir_galeria_general') }}" method="POST" enctype="multipart/form-data" class="bg-light p-4 rounded border text-center mb-5">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="file" name="fotos_generales" multiple class="form-control form-control-lg mb-3 mx-auto" style="max-width: 400px;" required>
+                    <button type="submit" class="btn btn-dark btn-lg fw-bold px-5">☁️ Subir Fotos a la Página</button>
+                </form>
+
+                <p class="fw-bold text-secondary">Fotos que ya están en tu página (Toca una para acomodarla):</p>
+                <div class="row g-3">
+                    {% for foto in galeria_general %}
+                    <div class="col-4 col-sm-3 col-md-2">
+                        <div class="position-relative border bg-white p-1 rounded shadow-sm" style="cursor:pointer;" onclick="abrirModalGeneral('{{ foto.ruta }}', {{ foto.id }}, '{{ foto.posicion_foco if foto.posicion_foco else '50 50' }}')">
+                            <img src="{{ foto.ruta }}" class="rounded w-100 object-fit-cover" style="aspect-ratio: 3/4; object-position: {{ foto.posicion_foco.split()[0] }}% {{ foto.posicion_foco.split()[1] }}% if foto.posicion_foco else '50% 50%' };">
+                            <a href="{{ url_for('eliminar_foto_general', id=foto.id) }}" class="position-absolute bottom-0 start-0 w-100 text-center bg-danger bg-opacity-75 text-white fw-bold small text-decoration-none py-1" onclick="event.stopPropagation(); return confirm('¿Borrar esta foto de la web?')">BORRAR</a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div id="modal-preview-general" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:9999; align-items:center; justify-content:center;">
+                    <div class="bg-white p-4 rounded" style="width: 320px; max-width: 90%;">
+                        <h5 class="fw-bold border-bottom pb-2 mb-3 text-center">Centrar Foto</h5>
+                        <div class="mb-3 mx-auto" style="width:160px; height:200px; background:#eee; border-radius:8px; overflow:hidden;">
+                            <img id="img-modal-general" src="" style="width:100%; height:100%; object-fit:cover;">
+                        </div>
+                        <label class="small fw-bold">↕️ Arriba / Abajo</label>
+                        <input type="range" id="range-v-general" class="form-range mb-2" min="0" max="100" value="50" oninput="ajustarFocalModal('img-modal-general', document.getElementById('range-h-general').value, this.value)">
+                        <label class="small fw-bold">↔️ Izq. / Derecha</label>
+                        <input type="range" id="range-h-general" class="form-range mb-3" min="0" max="100" value="50" oninput="ajustarFocalModal('img-modal-general', this.value, document.getElementById('range-v-general').value)">
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-secondary w-50" onclick="document.getElementById('modal-preview-general').style.display='none'">Cancelar</button>
+                            <button class="btn btn-success w-50 fw-bold" onclick="guardarYCerrarFocoGeneral()">Guardar</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- PESTAÑA TRAYECTORIA -->
+        <div class="tab-pane fade" id="tab-trayectoria" role="tabpanel">
+            <div class="friendly-card">
+                <h2 class="friendly-card-header text-primary">🗺️ Puntos de Control (Trayectoria)</h2>
+                <div class="help-box bg-light border-primary text-dark mb-4">
+                    Agrega los hitos importantes de tu carrera. Podés agregar varios y guardarlos todos juntos con el botón flotante.
+                </div>
+
+                <!-- Formulario de nuevo hito: staging, NO envía solo -->
+                <div class="bg-light p-3 border rounded mb-4">
+                    <p class="fw-bold mb-3">➕ Agregar un nuevo punto de control</p>
+                    <div class="row g-3" id="nuevo-hito-campos">
+                        <div class="col-md-3">
+                            <label class="small">Año o Fecha</label>
+                            <input type="text" id="nh-fecha" class="form-control form-control-sm" placeholder="Ej: 2018 o 'Marzo 2022'">
+                        </div>
+                        <div class="col-md-9">
+                            <label class="small">Título del Logro</label>
+                            <input type="text" id="nh-titulo" class="form-control form-control-sm" placeholder="Ej: Masterclass Novias VIP">
+                        </div>
+                        <div class="col-12">
+                            <label class="small">Descripción corta</label>
+                            <textarea id="nh-descripcion" class="form-control form-control-sm" rows="2" placeholder="Detalla brevemente de qué se trató..."></textarea>
+                        </div>
+                        <div class="col-12">
+                            <button type="button" class="btn btn-primary btn-sm px-4" onclick="agregarHitoTemp()">
+                                ➕ Agregar a la lista (se guarda con el botón flotante)
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Lista de hitos pendientes (aún no guardados) -->
+                    <ul class="list-group mt-3" id="lista-hitos-pendientes"></ul>
+                </div>
+
+                <h3 class="mb-2 text-secondary fw-bold fs-5">Tus puntos de control guardados:</h3>
+                {% if trayectoria %}
+                <p class="small text-muted mb-3">
+                    ☰ Arrastrá los hitos para reordenarlos. El nuevo orden se guarda con el botón flotante.
+                </p>
+                <ul class="list-group" id="lista-trayectoria">
+                    {% for hito in trayectoria %}
+                    <li class="list-group-item trayectoria-item d-flex align-items-center p-3 mb-2 border rounded shadow-sm"
+                        data-id="{{ hito.id }}">
+                        <span class="drag-handle me-3 text-secondary" style="font-size:1.2rem; cursor:grab; touch-action:none;">☰</span>
+                        <div class="flex-grow-1">
+                            <b class="d-block text-dark">{{ hito.titulo }}</b>
+                            <small class="text-muted">{{ hito.fecha_anio }}</small>
+                        </div>
+                        <a href="{{ url_for('eliminar_hito', id=hito.id) }}"
+                           class="btn btn-sm btn-outline-danger ms-2"
+                           onclick="return confirm('¿Eliminar este hito?')">🗑</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                    <p class="text-muted fst-italic" id="msg-sin-hitos">Aún no has agregado ningún punto a tu trayectoria.</p>
+                {% endif %}
+            </div>
+        </div>
+        <!-- FIN PESTAÑA TRAYECTORIA -->
+
+    </div>
+</div>
+
+<!-- =====================================================
+     SISTEMA DE STAGING DE CAMBIOS
+     Los formularios ya NO envían solos. Todos los cambios
+     se acumulan en "pendingForms" y se envían juntos al
+     presionar el botón flotante "Guardar todo".
+
+     EXCEPCIONES (se envían directo sin staging):
+       - Formularios de subida de galería de fotos
+       - Formularios de eliminar (links con confirm)
+       - Modales de foco de imagen (ya usan fetch propio)
+     ===================================================== -->
+
+<!-- Botón flotante de Guardar -->
+<div id="save-bar" style="
+    display: none;
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    z-index: 10000;
+    animation: slideUp 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+">
+    <button id="save-all-btn" onclick="guardarTodo()" style="
+        background: #2c3e50;
+        color: white;
+        border: none;
+        border-radius: 14px;
+        padding: 15px 28px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 8px 30px rgba(44,62,80,0.45);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: transform 0.15s ease, background 0.2s ease;
+    " onmouseover="this.style.background='#1a252f'" onmouseout="this.style.background='#2c3e50'">
+        <span style="font-size:1.3rem">💾</span>
+        <span>Guardar todos los cambios</span>
+        <span id="save-badge" style="
+            background: #e74c3c;
+            color: white;
+            border-radius: 50px;
+            padding: 2px 9px;
+            font-size: 0.78rem;
+            font-weight: 800;
+            min-width: 24px;
+            text-align: center;
+        ">0</span>
+    </button>
+</div>
+
+<!-- Toast de feedback -->
+<div id="save-toast" style="
+    display: none;
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    z-index: 10001;
+    background: #27ae60;
+    color: white;
+    border-radius: 12px;
+    padding: 14px 22px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    box-shadow: 0 8px 25px rgba(39,174,96,0.4);
+    animation: slideUp 0.3s ease;
+">✅ ¡Todos los cambios guardados!</div>
+
+<style>
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+/* Indicador visual en formularios con cambios pendientes */
+.form-has-changes {
+    outline: 2px solid #f39c12 !important;
+    outline-offset: 4px;
+    border-radius: 8px;
+}
+.trayectoria-item.drag-over {
+    background-color: #eaf4fb !important;
+    border: 2px dashed #3498db !important;
+}
+.sortable-ghost  { opacity: 0.35; background: #dce9f5 !important; }
+.sortable-chosen { box-shadow: 0 4px 16px rgba(44,62,80,0.18) !important; }
+.sortable-drag   { opacity: 1 !important; }
+}
+</style>
+
+<script>
+// ════════════════════════════════════════════════════════════════════
+//  SISTEMA DE STAGING UNIFICADO
+//  Un solo guardarTodo() que maneja todo: formularios, precios y paquetes.
+// ════════════════════════════════════════════════════════════════════
+
+// ── Toggle precio subservicio (UI) ────────────────────────────────
+function togglePreciosSub(subId) {
+    const seccion  = document.getElementById('seccion-precios-' + subId);
+    const checkbox = document.getElementById('check-precio-' + subId);
+    if (!seccion) return;
+    const visible = seccion.style.display !== 'none';
+    seccion.style.display = visible ? 'none' : 'block';
+    if (checkbox) checkbox.checked = !visible;
+}
+
+// ── Arrays de staging ─────────────────────────────────────────────
+const pendingForms       = new Map(); // formularios editados
+const pendingPrecios     = [];        // precios de subservicios
+const pendingPreciosServ = [];        // precios de servicios
+const pendingPaquetes    = [];        // paquetes
+const pendingHitos       = [];        // hitos nuevos sin guardar
+const pendingExperiencias = [];       // testimonios nuevos sin guardar
+const pendingFaqs        = [];        // FAQs nuevas sin guardar
+let   _trayectoriaDirty  = false;     // reordenamiento de hitos pendiente
+
+// ── Formularios excluidos del staging (se envían directo) ─────────
+function esFormularioExcluido(form) {
+    const action = form.action || '';
+    return [
+        'subir_galeria', 'subir_foto',
+        'nuevo_curso', 'nuevo_servicio',
+        'nuevo_subservicio', 'nuevo_paquete', 'nuevo_precio',
+    ].some(k => action.includes(k));
+}
+
+// ── Badge y barra ─────────────────────────────────────────────────
+function actualizarBadge() {
+    const total = pendingForms.size
+                + pendingPrecios.filter(Boolean).length
+                + pendingPreciosServ.filter(Boolean).length
+                + pendingPaquetes.filter(Boolean).length
+                + pendingHitos.filter(Boolean).length
+                + pendingExperiencias.filter(Boolean).length
+                + pendingFaqs.filter(Boolean).length
+                + (_trayectoriaDirty ? 1 : 0);
+    document.getElementById('save-badge').textContent = total;
+    document.getElementById('save-bar').style.display = total > 0 ? 'block' : 'none';
+}
+
+function registrarCambio(form) {
+    if (esFormularioExcluido(form)) return;
+    if (!pendingForms.has(form)) {
+        pendingForms.set(form, {
+            action: form.getAttribute('action'),
+            method: form.getAttribute('method') || 'POST',
+        });
+        form.classList.add('form-has-changes');
+    }
+    actualizarBadge();
+}
+
+// ── GUARDAR TODO ──────────────────────────────────────────────────
+async function guardarTodo() {
+    const btn = document.getElementById('save-all-btn');
+    btn.disabled = true;
+    btn.querySelector('span:nth-child(2)').textContent = 'Guardando...';
+
+    const csrfToken = document.querySelector('input[name=csrf_token]').value;
+
+    try {
+        // 1. Formularios normales (editar servicio, subservicio, config, etc.)
+        for (const [form, meta] of Array.from(pendingForms.entries())) {
+            try {
+                const fd = new FormData(form);
+                if (!fd.get('csrf_token')) fd.append('csrf_token', csrfToken);
+                await fetch(meta.action, { method: 'POST', body: fd });
+            } catch(e) { console.error('Error form:', meta.action, e); }
+        }
+        pendingForms.clear();
+
+        // 2. Precios de subservicios
+        for (const p of pendingPrecios.filter(Boolean)) {
+            try {
+                const fd = new FormData();
+                fd.append('csrf_token',    csrfToken);
+                fd.append('subservicio_id', p.subservicio_id);
+                fd.append('descripcion',    p.descripcion);
+                fd.append('precio_base',    p.precio_base);
+                await fetch('{{ url_for("nuevo_precio_subservicio") }}', { method: 'POST', body: fd });
+            } catch(e) { console.error('Error precio sub:', e); }
+        }
+        pendingPrecios.length = 0;
+
+        // 3. Precios de servicios
+        for (const p of pendingPreciosServ.filter(Boolean)) {
+            try {
+                const fd = new FormData();
+                fd.append('csrf_token',  csrfToken);
+                fd.append('servicio_id', p.servicio_id);
+                fd.append('descripcion', p.descripcion);
+                fd.append('precio_base', p.precio_base);
+                await fetch('{{ url_for("nuevo_precio_servicio") }}', { method: 'POST', body: fd });
+            } catch(e) { console.error('Error precio serv:', e); }
+        }
+        pendingPreciosServ.length = 0;
+
+        // 4. Paquetes
+        for (const p of pendingPaquetes.filter(Boolean)) {
+            try {
+                const fd = new FormData();
+                fd.append('csrf_token',  csrfToken);
+                fd.append('servicio_id', p.servicio_id);
+                fd.append('nombre',      p.nombre);
+                fd.append('descripcion', p.descripcion);
+                await fetch('{{ url_for("nuevo_paquete") }}', { method: 'POST', body: fd });
+            } catch(e) { console.error('Error paquete:', e); }
+        }
+        pendingPaquetes.length = 0;
+
+        // 5. Hitos nuevos pendientes
+        await guardarHitosPendientes(csrfToken);
+
+        // 6. Orden de trayectoria
+        await guardarOrdenTrayectoria(csrfToken);
+
+        // 7. Testimonios nuevos
+        for (const exp of pendingExperiencias.filter(Boolean)) {
+            try {
+                const fd = new FormData();
+                fd.append('csrf_token', csrfToken);
+                fd.append('nombre',     exp.nombre);
+                fd.append('testimonio', exp.testimonio);
+                if (exp.foto) fd.append('foto_perfil', exp.foto);
+                await fetch('{{ url_for("nueva_experiencia") }}', { method: 'POST', body: fd });
+            } catch(e) { console.error('Error experiencia:', e); }
+        }
+        pendingExperiencias.length = 0;
+
+        // 8. FAQs nuevas
+        for (const faq of pendingFaqs.filter(Boolean)) {
+            try {
+                const fd = new FormData();
+                fd.append('csrf_token', csrfToken);
+                fd.append('pregunta',   faq.pregunta);
+                fd.append('respuesta',  faq.respuesta);
+                await fetch('{{ url_for("nueva_faq") }}', { method: 'POST', body: fd });
+            } catch(e) { console.error('Error faq:', e); }
+        }
+        pendingFaqs.length = 0;
+
+    } catch(e) {
+        console.error('Error inesperado en guardarTodo:', e);
+    } finally {
+        // Siempre recarga, pase lo que pase
+        window.location.reload();
+    }
+}
+
+// ── Interceptar formularios al cargar ────────────────────────────
+document.addEventListener('DOMContentLoaded', function () {
+
+    // Registrar cambios en todos los forms no excluidos
+    document.querySelectorAll('form').forEach(form => {
+        if (esFormularioExcluido(form)) return;
+        form.addEventListener('input',  () => registrarCambio(form));
+        form.addEventListener('change', () => registrarCambio(form));
+        form.addEventListener('submit', function(e) {
+            if (esFormularioExcluido(form)) return;
+            e.preventDefault();
+            registrarCambio(form);
+        });
+    });
+
+    // UI: mostrar/ocultar campos de duración y precio según checkboxes
+    function actualizarUI(form) {
+        const checkDur = form.querySelector('input[name="mostrar_duracion"]');
+        const durCont  = form.querySelector('.duracion-input-container');
+        if (checkDur && durCont) durCont.style.display = checkDur.checked ? 'block' : 'none';
+
+        const checkPre = form.querySelector('input[name="mostrar_precio"]');
+        const contPre  = form.querySelector('.precio-config-container');
+        if (checkPre && contPre) {
+            contPre.style.display = checkPre.checked ? 'block' : 'none';
+            const select = form.querySelector('select[name="tipo_precio"]');
+            const fijo   = form.querySelector('.campo-fijo');
+            const rango  = form.querySelector('.campo-rango');
+            if (select && fijo && rango) {
+                fijo.style.display  = select.value === 'base' ? 'block' : 'none';
+                rango.style.display = select.value === 'base' ? 'none'  : 'block';
+            }
+        }
+    }
+
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('change', e => {
+            if (['mostrar_duracion', 'mostrar_precio', 'tipo_precio'].includes(e.target.name))
+                actualizarUI(form);
+        });
+        actualizarUI(form);
+    });
+});
+
+// ── Precios de SUBSERVICIOS ───────────────────────────────────────
+function agregarPrecioTemp(subId) {
+    const descInput = document.getElementById(`new-precio-desc-${subId}`);
+    const valInput  = document.getElementById(`new-precio-val-${subId}`);
+    const desc = descInput.value.trim();
+    const val  = valInput.value.trim();
+    if (!desc || !val) {
+        descInput.classList.toggle('border-danger', !desc);
+        valInput.classList.toggle('border-danger', !val);
+        return;
+    }
+    descInput.classList.remove('border-danger');
+    valInput.classList.remove('border-danger');
+    pendingPrecios.push({ subservicio_id: subId, descripcion: desc, precio_base: val });
+    const idx = pendingPrecios.length - 1;
+    const lista = document.getElementById(`lista-precios-${subId}`);
+    const li = document.createElement('li');
+    li.className = 'list-group-item d-flex justify-content-between p-1 small';
+    li.innerHTML = `<span>${desc}: <b>$${val}</b> <span class="badge bg-warning text-dark ms-1" style="font-size:0.65rem">pendiente</span></span>
+                    <button type="button" class="btn btn-link text-danger p-0 fw-bold" onclick="quitarPrecioTemp(this,${idx})">x</button>`;
+    lista.appendChild(li);
+    descInput.value = ''; valInput.value = '';
+    actualizarBadge();
+}
+
+function quitarPrecioTemp(btn, idx) {
+    pendingPrecios[idx] = null;
+    btn.closest('li').remove();
+    actualizarBadge();
+}
+
+// ── Precios de SERVICIOS ──────────────────────────────────────────
+function togglePreciosServ(servId) {
+    const check   = document.getElementById(`check-precio-serv-${servId}`);
+    const seccion = document.getElementById(`seccion-precios-serv-${servId}`);
+    if (seccion) seccion.style.display = check.checked ? 'block' : 'none';
+}
+
+function agregarPrecioServTemp(servId) {
+    const descInput = document.getElementById(`new-precio-serv-desc-${servId}`);
+    const valInput  = document.getElementById(`new-precio-serv-val-${servId}`);
+    const desc = descInput.value.trim();
+    const val  = valInput.value.trim();
+    if (!val) { valInput.classList.add('border-danger'); return; }
+    valInput.classList.remove('border-danger');
+    pendingPreciosServ.push({ servicio_id: servId, descripcion: desc, precio_base: val });
+    const idx = pendingPreciosServ.length - 1;
+    const lista = document.getElementById(`lista-precios-serv-${servId}`);
+    const li = document.createElement('li');
+    li.className = 'list-group-item d-flex justify-content-between p-1 small';
+    li.innerHTML = `<span>${desc || 'General'}: <b>$${val}</b> <span class="badge bg-warning text-dark ms-1" style="font-size:0.6rem">pendiente</span></span>
+                    <button type="button" class="btn btn-sm btn-link text-danger p-0" onclick="quitarPrecioServTemp(this,${idx})">x</button>`;
+    lista.appendChild(li);
+    descInput.value = ''; valInput.value = '';
+    actualizarBadge();
+}
+
+function quitarPrecioServTemp(btn, idx) {
+    pendingPreciosServ[idx] = null;
+    btn.closest('li').remove();
+    actualizarBadge();
+}
+
+// ── Paquetes ──────────────────────────────────────────────────────
+function agregarPaqueteTemp(servId) {
+    const nomInput  = document.getElementById(`new-paq-nom-${servId}`);
+    const descInput = document.getElementById(`new-paq-desc-${servId}`);
+    const nom  = nomInput.value.trim();
+    const desc = descInput.value.trim();
+    if (!nom || !desc) {
+        nomInput.classList.toggle('border-danger', !nom);
+        descInput.classList.toggle('border-danger', !desc);
+        return;
+    }
+    nomInput.classList.remove('border-danger');
+    descInput.classList.remove('border-danger');
+    pendingPaquetes.push({ servicio_id: servId, nombre: nom, descripcion: desc });
+    const idx = pendingPaquetes.length - 1;
+    const lista = document.getElementById(`lista-paquetes-temp-${servId}`);
+    const li = document.createElement('li');
+    li.className = 'list-group-item d-flex justify-content-between align-items-center bg-light';
+    li.innerHTML = `<div><b>${nom}</b> - <span class="text-muted">${desc}</span>
+                    <span class="badge bg-warning text-dark ms-2" style="font-size:0.65rem">pendiente</span></div>
+                    <button type="button" class="btn btn-sm btn-danger" onclick="quitarPaqueteTemp(this,${idx})">🗑</button>`;
+    lista.appendChild(li);
+    nomInput.value = ''; descInput.value = '';
+    actualizarBadge();
+}
+
+function quitarPaqueteTemp(btn, idx) {
+    pendingPaquetes[idx] = null;
+    btn.closest('li').remove();
+    actualizarBadge();
+}
+
+// ── Testimonios ───────────────────────────────────────────────────
+function agregarExpTemp() {
+    const nombreEl    = document.getElementById('exp-nombre');
+    const testimonioEl = document.getElementById('exp-testimonio');
+    const fotoEl      = document.getElementById('exp-foto');
+    const nombre    = nombreEl.value.trim();
+    const testimonio = testimonioEl.value.trim();
+    const foto      = fotoEl.files[0] || null;
+
+    nombreEl.classList.toggle('border-danger', !nombre);
+    testimonioEl.classList.toggle('border-danger', !testimonio);
+    fotoEl.classList.toggle('border-danger', !foto);
+    if (!nombre || !testimonio || !foto) return;
+
+    // Preview local de la foto
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const fotoSrc = e.target.result;
+        pendingExperiencias.push({ nombre, testimonio, foto });
+        const idx = pendingExperiencias.length - 1;
+
+        const lista = document.getElementById('lista-exp-pendientes');
+        const li = document.createElement('li');
+        li.className = 'list-group-item d-flex align-items-center p-2 mb-2 border rounded shadow-sm';
+        li.innerHTML = `
+            <img src="${fotoSrc}" class="rounded-circle me-3 flex-shrink-0" style="width:40px; height:40px; object-fit:cover;">
+            <div class="flex-grow-1">
+                <strong class="d-block lh-1">${nombre}</strong>
+                <small class="text-muted">${testimonio.substring(0, 60)}${testimonio.length > 60 ? '…' : ''}</small>
+                <span class="badge bg-warning text-dark ms-1" style="font-size:0.65rem">pendiente</span>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="quitarExpTemp(this, ${idx})">✕</button>
+        `;
+        lista.appendChild(li);
+
+        nombreEl.value = '';
+        testimonioEl.value = '';
+        fotoEl.value = '';
+        [nombreEl, testimonioEl, fotoEl].forEach(el => el.classList.remove('border-danger'));
+        actualizarBadge();
+    };
+    reader.readAsDataURL(foto);
+}
+
+function quitarExpTemp(btn, idx) {
+    pendingExperiencias[idx] = null;
+    btn.closest('li').remove();
+    actualizarBadge();
+}
+
+// ── FAQs ──────────────────────────────────────────────────────────
+function agregarFaqTemp() {
+    const preguntaEl  = document.getElementById('faq-pregunta');
+    const respuestaEl = document.getElementById('faq-respuesta');
+    const pregunta  = preguntaEl.value.trim();
+    const respuesta = respuestaEl.value.trim();
+
+    preguntaEl.classList.toggle('border-danger', !pregunta);
+    respuestaEl.classList.toggle('border-danger', !respuesta);
+    if (!pregunta || !respuesta) return;
+
+    pendingFaqs.push({ pregunta, respuesta });
+    const idx = pendingFaqs.length - 1;
+
+    const lista = document.getElementById('lista-faq-pendientes');
+    const li = document.createElement('li');
+    li.className = 'list-group-item d-flex justify-content-between align-items-start p-2 mb-2 border rounded shadow-sm';
+    li.innerHTML = `
+        <div class="flex-grow-1">
+            <b class="small d-block text-dark">${pregunta}</b>
+            <small class="text-muted">${respuesta.substring(0, 80)}${respuesta.length > 80 ? '…' : ''}</small>
+            <span class="badge bg-warning text-dark ms-1" style="font-size:0.65rem">pendiente</span>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-danger ms-2 flex-shrink-0" onclick="quitarFaqTemp(this, ${idx})">✕</button>
+    `;
+    lista.appendChild(li);
+
+    preguntaEl.value = '';
+    respuestaEl.value = '';
+    [preguntaEl, respuestaEl].forEach(el => el.classList.remove('border-danger'));
+    actualizarBadge();
+}
+
+function quitarFaqTemp(btn, idx) {
+    pendingFaqs[idx] = null;
+    btn.closest('li').remove();
+    actualizarBadge();
+}
+</script>
+</script>
+
+<script>
+// ─── MODALES DE FOCO DE IMAGEN (sin cambios, ya usan fetch propio) ────────────
+
+function moverFoco(previewId, labelId, value) {
+    const preview = document.getElementById(previewId);
+    if (preview) preview.style.backgroundPosition = `center ${value}%`;
+}
+
+function abrirPreviewFoto(ruta, fotoId, focoInicial, modalId) {
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+    modal.dataset.fotoIdActual = fotoId;
+    const img    = modal.querySelector('img');
+    const rangeV = modal.querySelector('input[id^="range-v-s"]');
+    const rangeH = modal.querySelector('input[id^="range-h-s"]');
+    img.src = ruta;
+    const partes = String(focoInicial).trim().split(/\s+/);
+    const h = parseInt(partes[0]) || 50;
+    const v = parseInt(partes[1]) || 50;
+    img.style.objectPosition = `${h}% ${v}%`;
+    if (rangeV) rangeV.value = v;
+    if (rangeH) rangeH.value = h;
+    modal.style.display = 'flex';
+}
+
+function ajustarFocalModal(imgId, hValue, vValue) {
+    const img = document.getElementById(imgId);
+    if (img) img.style.objectPosition = `${hValue}% ${vValue}%`;
+}
+
+function cerrarPreviewModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+function guardarYCerrarFoco(modalId, rangeVId, rangeHId) {
+    const modal  = document.getElementById(modalId);
+    const fotoId = modal.dataset.fotoIdActual;
+    const v      = document.getElementById(rangeVId).value;
+    const h      = document.getElementById(rangeHId).value;
+    if (fotoId) {
+        const formData   = new FormData();
+        const csrfToken  = document.querySelector('input[name=csrf_token]').value;
+        formData.append('posicion_foco', `${h} ${v}`);
+        fetch(`/admin/subservicio/foto/foco/${fotoId}`, {
+            method: 'POST', body: formData, headers: { 'X-CSRFToken': csrfToken }
+        }).then(res => { if (res.ok) window.location.reload(); });
+    }
+}
+
+let _globalFotoId = null;
+function abrirModalGeneral(ruta, id, foco) {
+    _globalFotoId = id;
+    const img    = document.getElementById('img-modal-general');
+    img.src      = ruta;
+    const partes = String(foco).trim().split(/\s+/);
+    const h = parseInt(partes[0]) || 50;
+    const v = parseInt(partes[1]) || 50;
+    img.style.objectPosition = `${h}% ${v}%`;
+    document.getElementById('range-v-general').value = v;
+    document.getElementById('range-h-general').value = h;
+    document.getElementById('modal-preview-general').style.display = 'flex';
+}
+
+function guardarYCerrarFocoGeneral() {
+    const v = document.getElementById('range-v-general').value;
+    const h = document.getElementById('range-h-general').value;
+    if (_globalFotoId) {
+        const formData  = new FormData();
+        const csrfToken = document.querySelector('input[name=csrf_token]').value;
+        formData.append('posicion_foco', `${h} ${v}`);
+        fetch(`/admin/galeria-general/foco/${_globalFotoId}`, {
+            method: 'POST', body: formData, headers: { 'X-CSRFToken': csrfToken }
+        }).then(res => { if (res.ok) window.location.reload(); });
+    }
+}
+
+// ── DRAG & DROP TRAYECTORIA con SortableJS ───────────────────────
+
+document.addEventListener('DOMContentLoaded', function() {
+    const lista = document.getElementById('lista-trayectoria');
+    if (!lista) return;
+
+    // Cargamos SortableJS dinámicamente
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js';
+    script.onload = function() {
+        Sortable.create(lista, {
+            animation:      150,
+            handle:         '.drag-handle',
+            ghostClass:     'sortable-ghost',
+            chosenClass:    'sortable-chosen',
+            dragClass:      'sortable-drag',
+            onEnd: function() {
+                if (!_trayectoriaDirty) {
+                    _trayectoriaDirty = true;
+                    actualizarBadge();
+                }
+            }
+        });
+    };
+    document.head.appendChild(script);
+});
+
+// ── HITOS PENDIENTES (nuevos sin guardar) ────────────────────────
+
+function agregarHitoTemp() {
+    const fecha = document.getElementById('nh-fecha').value.trim();
+    const titulo = document.getElementById('nh-titulo').value.trim();
+    const desc = document.getElementById('nh-descripcion').value.trim();
+
+    // Validación
+    const fechaEl = document.getElementById('nh-fecha');
+    const tituloEl = document.getElementById('nh-titulo');
+    const descEl = document.getElementById('nh-descripcion');
+    fechaEl.classList.toggle('border-danger', !fecha);
+    tituloEl.classList.toggle('border-danger', !titulo);
+    descEl.classList.toggle('border-danger', !desc);
+    if (!fecha || !titulo || !desc) return;
+
+    pendingHitos.push({ fecha_anio: fecha, titulo, descripcion: desc });
+    const idx = pendingHitos.length - 1;
+
+    // Mostrar en la lista de pendientes
+    const lista = document.getElementById('lista-hitos-pendientes');
+    const li = document.createElement('li');
+    li.className = 'list-group-item d-flex justify-content-between align-items-center py-2';
+    li.innerHTML = `
+        <div>
+            <b>${titulo}</b> <span class="text-muted small">(${fecha})</span>
+            <span class="badge bg-warning text-dark ms-2" style="font-size:0.65rem">pendiente</span>
+            <div class="text-muted small">${desc}</div>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-danger ms-2" onclick="quitarHitoTemp(this, ${idx})">✕</button>
+    `;
+    lista.appendChild(li);
+
+    // Limpiar campos
+    document.getElementById('nh-fecha').value = '';
+    document.getElementById('nh-titulo').value = '';
+    document.getElementById('nh-descripcion').value = '';
+    [fechaEl, tituloEl, descEl].forEach(el => el.classList.remove('border-danger'));
+
+    actualizarBadge();
+}
+
+function quitarHitoTemp(btn, idx) {
+    pendingHitos[idx] = null;
+    btn.closest('li').remove();
+    actualizarBadge();
+}
+
+// ── GUARDAR ORDEN DE TRAYECTORIA ─────────────────────────────────
+
+async function guardarOrdenTrayectoria(csrfToken) {
+    if (!_trayectoriaDirty) return;
+    const items = document.querySelectorAll('#lista-trayectoria .trayectoria-item');
+    const orden = Array.from(items).map((el, idx) => ({
+        id:    parseInt(el.dataset.id),
+        orden: idx
+    }));
+    await fetch('/admin/hito/reordenar', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
+        body:    JSON.stringify({ orden })
+    });
+    _trayectoriaDirty = false;
+}
+
+// ── GUARDAR HITOS NUEVOS ─────────────────────────────────────────
+
+async function guardarHitosPendientes(csrfToken) {
+    for (const h of pendingHitos.filter(Boolean)) {
+        try {
+            const fd = new FormData();
+            fd.append('csrf_token',  csrfToken);
+            fd.append('fecha_anio',  h.fecha_anio);
+            fd.append('titulo',      h.titulo);
+            fd.append('descripcion', h.descripcion);
+            await fetch('/admin/hito/nuevo', { method: 'POST', body: fd });
+        } catch(e) { console.error('Error nuevo hito:', e); }
+    }
+    pendingHitos.length = 0;
+}
+
+
+
+function toggleEditSubDuracion(id) {
+    const check = document.getElementById(`edit_sub_mostrar_duracion_${id}`);
+    const container = document.getElementById(`edit_sub_duracion_container_${id}`);
+    if (check && container) container.style.display = check.checked ? 'block' : 'none';
+}
+
+function toggleEditSubPrecio(id) {
+    const check = document.getElementById(`edit_sub_mostrar_precio_${id}`);
+    const config = document.getElementById(`edit_sub_precio_config_${id}`);
+    if (check && config) config.style.display = check.checked ? 'block' : 'none';
+}
+
+function toggleEditSubCamposPrecio(id) {
+    const select = document.getElementById(`edit_sub_tipo_precio_${id}`);
+    const fijo = document.getElementById(`edit_sub_campo_fijo_${id}`);
+    const rango = document.getElementById(`edit_sub_campo_rango_${id}`);
+    if (select && fijo && rango) {
+        if (select.value === 'base') {
+            fijo.style.display = 'block';
+            rango.style.display = 'none';
+        } else {
+            fijo.style.display = 'none';
+            rango.style.display = 'block';
+        }
+    }
+}
+</script>
+
+
+{% endblock %}

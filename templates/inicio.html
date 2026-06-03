@@ -1,0 +1,933 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<section id="inicio" class="w-100 pt-1 pb-4 bg-white">
+    <div class="container px-2 px-md-4" style="max-width: 100%; margin: 0 auto;">        
+        <div class="row g-1 justify-content-center">
+            <div class="col-4">
+                <div style="aspect-ratio: 3/4; width: 100%; overflow: hidden; background-color: #f8f9fa;">
+                    <img src="{{ global_config.imagen_inicio_1 if (global_config and global_config.imagen_inicio_1) else 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=600&auto=format&fit=cover' }}" 
+                         class="w-100 h-100" style="object-fit: cover; object-position: center;">
+                </div>
+            </div>
+            <div class="col-4">
+                <div style="aspect-ratio: 3/4; width: 100%; overflow: hidden; background-color: #f8f9fa;">
+                    <img src="{{ global_config.imagen_hero if (global_config and global_config.imagen_hero) else 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?q=80&w=600&auto=format&fit=cover' }}" 
+                         class="w-100 h-100" style="object-fit: cover; object-position: center {{ global_config.posicion_foco_hero if (global_config and global_config.posicion_foco_hero) else '50%' }};">
+                </div>
+            </div>
+            <div class="col-4">
+                <div style="aspect-ratio: 3/4; width: 100%; overflow: hidden; background-color: #f8f9fa;">
+                    <img src="{{ global_config.imagen_inicio_3 if (global_config and global_config.imagen_inicio_3) else 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?q=80&w=600&auto=format&fit=cover' }}" 
+                         class="w-100 h-100" style="object-fit: cover; object-position: center;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container text-center mt-4 pt-2">
+        <p class="font-serif m-0 text-uppercase" style="font-size: 0.82rem; letter-spacing: 4px; font-weight: 400; color: #111111;">
+            Realzando tu belleza natural
+        </p>
+    </div>
+</section>
+
+<!-- Barra de Booking -->
+<div class="w-100 text-center bg-dark text-white py-2" style="font-size: 0.65rem; letter-spacing: 3px; text-transform: uppercase; font-family: 'Jost', sans-serif; font-weight: 300;">
+    Booking Available for 2026
+</div>
+
+<style>
+/* ═══════════════════════════════════════════════
+   DESIGN SYSTEM — Angels Beauty
+   Paleta: marfil cálido · negro profundo · rosa palo · oro sutil
+   ═══════════════════════════════════════════════ */
+:root {
+    --ivory:      #faf6f1;
+    --blush:      #f5e8e0;
+    --blush-dark: #e8cfc3;
+    --ink:        #1a120f;
+    --ink-mid:    #3d2b22;
+    --muted:      #7a6a63;
+    --gold:       #b89d82;
+    --gold-light: #d4b99a;
+    --white:      #ffffff;
+    --serif:      'Cinzel', 'Didot', serif;
+    --sans:       'Jost', sans-serif;
+}
+
+/* ── Scroll reveal ── */
+.reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.75s cubic-bezier(.22,.61,.36,1), transform 0.75s cubic-bezier(.22,.61,.36,1);
+}
+.reveal.visible { opacity: 1; transform: none; }
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.22s; }
+.reveal-delay-3 { transition-delay: 0.36s; }
+
+/* ── Section header ornament ── */
+.sec-ornament {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-bottom: 10px;
+}
+.sec-ornament::before,
+.sec-ornament::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: var(--gold);
+}
+.sec-label {
+    font-family: var(--sans);
+    font-size: 0.6rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold);
+}
+.sec-title {
+    font-family: var(--serif);
+    font-size: clamp(1.1rem, 3vw, 1.9rem);
+    font-weight: 300;
+    letter-spacing: 3px;
+    color: var(--ink);
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 0;
+}
+
+/* ── Sobre mí ── */
+.about-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 245px;
+}
+@media (max-width: 767px) {
+    .about-wrap { grid-template-columns: 1fr; }
+    .about-img-col { order: -1; min-height: 260px; }
+}
+.about-img-col {
+    position: relative;
+    overflow: hidden;
+    min-height: 245px;
+}
+.about-img-col:hover img { transform: scale(1.04); }
+.about-img-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(26,18,15,0.18) 0%, transparent 60%);
+    pointer-events: none;
+}
+.about-text-col {
+    background: var(--blush);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: clamp(1.8rem, 4vw, 3.5rem) clamp(1.5rem, 3.5vw, 3.2rem);
+    position: relative;
+}
+.about-text-col::before {
+    content: '"';
+    font-family: var(--serif);
+    font-size: 15.4rem;
+    color: rgba(184,157,130,0.12);
+    position: absolute;
+    top: -2rem; left: 1.5rem;
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+}
+.about-eyebrow {
+    font-family: var(--sans);
+    font-size: 0.66rem;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.about-eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 28px; height: 1px;
+    background: var(--gold);
+}
+.about-heading {
+    font-family: var(--serif);
+    font-size: clamp(1.1rem, 2.75vw, 1.76rem);
+    font-weight: 300;
+    color: var(--ink);
+    letter-spacing: 2px;
+    line-height: 1.3;
+    margin-bottom: 1.2rem;
+}
+.about-body {
+    font-family: var(--sans);
+    font-size: clamp(0.79rem, 1.54vw, 0.9rem);
+    color: var(--muted);
+    line-height: 1.75;
+    font-weight: 300;
+    margin-bottom: 1.5rem;
+}
+.btn-about {
+    display: inline-block;
+    font-family: var(--sans);
+    font-size: 0.68rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--gold);
+    padding-bottom: 3px;
+    transition: color 0.25s, border-color 0.25s, letter-spacing 0.3s;
+    align-self: flex-start;
+}
+.btn-about:hover {
+    color: var(--gold);
+    border-color: var(--gold-light);
+    letter-spacing: 4px;
+}
+
+/* ── Booking strip ── */
+.booking-strip {
+    background: var(--ink);
+    color: var(--white);
+    text-align: center;
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+}
+.booking-strip::before {
+    display: none;
+}
+.booking-strip a {
+    font-family: var(--sans);
+    font-size: 0.6rem;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: var(--white);
+    text-decoration: none;
+    position: relative;
+    padding: 10px 32px;
+    border: 1px solid rgba(255,255,255,0.25);
+    transition: background 0.3s, border-color 0.3s, color 0.3s;
+    display: inline-block;
+}
+.booking-strip a:hover {
+    background: var(--white);
+    color: var(--ink);
+    border-color: var(--white);
+}
+.booking-strip-label {
+    font-family: var(--sans);
+    font-size: 0.55rem;
+    letter-spacing: 5px;
+    color: var(--gold-light);
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 12px;
+}
+
+/* ── Servicios & Cursos ── */
+.catalog-section {
+    padding: clamp(3rem, 7vw, 6rem) 0;
+    background: var(--ivory);
+}
+.catalog-section.alt { background: var(--white); }
+
+/* Carousel wrapper */
+.catalog-carousel {
+    position: relative;
+    margin-top: 2.5rem;
+    overflow: hidden;
+}
+.catalog-track-wrap {
+    overflow: hidden;
+}
+.catalog-grid {
+    display: flex;
+    transition: transform 0.55s cubic-bezier(.22,.61,.36,1);
+    will-change: transform;
+}
+.catalog-item {
+    flex: 0 0 calc(100% / 3);
+    max-width: calc(100% / 3);
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 3/4;
+    display: block;
+    text-decoration: none;
+    background: #e0d5cc;
+    box-sizing: border-box;
+}
+@media (max-width: 767px) {
+    .catalog-item {
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+}
+@media (max-width: 480px) {
+    .catalog-item {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+.catalog-item img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s cubic-bezier(.22,.61,.36,1);
+}
+.catalog-item:hover img { transform: scale(1.06); }
+.catalog-item-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(26,18,15,0.72) 0%, rgba(26,18,15,0) 50%);
+    display: flex;
+    align-items: flex-end;
+    padding: 1.4rem 1.2rem;
+    transition: background 0.4s;
+}
+.catalog-item:hover .catalog-item-overlay {
+    background: linear-gradient(to top, rgba(26,18,15,0.82) 0%, rgba(26,18,15,0.1) 60%);
+}
+.catalog-item-name {
+    font-family: var(--serif);
+    font-size: clamp(0.75rem, 1.8vw, 1rem);
+    color: var(--white);
+    letter-spacing: 2px;
+    font-weight: 300;
+    text-transform: uppercase;
+    line-height: 1.3;
+}
+.catalog-item-sub {
+    font-family: var(--sans);
+    font-size: 0.55rem;
+    color: var(--gold-light);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    display: block;
+    margin-top: 4px;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.3s, transform 0.3s;
+}
+.catalog-item:hover .catalog-item-sub { opacity: 1; transform: none; }
+
+/* Flechas del carousel */
+.catalog-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    background: rgba(26,18,15,0.55);
+    border: 1px solid rgba(184,157,130,0.4);
+    color: var(--white);
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: background 0.3s, opacity 0.3s, border-color 0.3s;
+    opacity: 0.7;
+    font-size: 0.9rem;
+    line-height: 1;
+}
+.catalog-arrow:hover { background: rgba(184,157,130,0.85); border-color: var(--gold); opacity: 1; }
+.catalog-arrow.prev { left: 12px; }
+.catalog-arrow.next { right: 12px; }
+.catalog-arrow:disabled { opacity: 0.2; cursor: default; pointer-events: none; }
+
+/* Dots */
+.catalog-dots {
+    display: flex;
+    justify-content: center;
+    gap: 7px;
+    margin-top: 1.4rem;
+}
+.catalog-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--gold);
+    opacity: 0.3;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: opacity 0.3s, transform 0.3s;
+}
+.catalog-dot.active { opacity: 1; transform: scale(1.3); }
+
+/* ── Testimonios ── */
+.testimonios-section {
+    background: var(--ink);
+    padding: clamp(4rem, 8vw, 7rem) 0;
+    position: relative;
+    overflow: hidden;
+}
+.testimonios-section::before {
+    content: '';
+    position: absolute;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(184,157,130,0.08) 0%, transparent 70%);
+    top: -100px; right: -100px;
+    pointer-events: none;
+}
+.testimonio-card {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    text-align: center;
+}
+.testimonio-quote {
+    font-family: var(--serif);
+    font-size: clamp(1rem, 2.5vw, 1.35rem);
+    color: var(--white);
+    font-weight: 300;
+    font-style: italic;
+    line-height: 1.75;
+    margin-bottom: 2rem;
+    position: relative;
+}
+.testimonio-avatar {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--gold);
+    margin: 0 auto 1rem;
+    display: block;
+    filter: grayscale(20%);
+}
+.testimonio-name {
+    font-family: var(--sans);
+    font-size: 0.6rem;
+    letter-spacing: 4px;
+    color: var(--gold-light);
+    text-transform: uppercase;
+}
+/* Dots del carousel de testimonios */
+#carouselTestimonios .carousel-indicators {
+    bottom: -2rem;
+}
+#carouselTestimonios .carousel-indicators [data-bs-target] {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--gold);
+    opacity: 0.35;
+    border: none;
+}
+#carouselTestimonios .carousel-indicators .active { opacity: 1; }
+
+/* ── FAQ ── */
+.faq-section {
+    background: var(--blush);
+    padding: clamp(3.5rem, 7vw, 6rem) 0;
+}
+.faq-item {
+    border-bottom: 1px solid var(--blush-dark);
+    padding: 0;
+}
+.faq-btn {
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 1.4rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    text-align: left;
+    gap: 1rem;
+}
+.faq-btn-text {
+    font-family: var(--serif);
+    font-size: clamp(0.85rem, 2vw, 1rem);
+    color: var(--ink);
+    font-weight: 300;
+    letter-spacing: 0.5px;
+    line-height: 1.4;
+}
+.faq-icon {
+    flex-shrink: 0;
+    width: 22px; height: 22px;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--gold);
+    font-size: 0.75rem;
+    transition: transform 0.3s, background 0.3s;
+}
+.faq-btn[aria-expanded="true"] .faq-icon {
+    transform: rotate(45deg);
+    background: var(--gold);
+    color: var(--white);
+}
+.faq-answer {
+    font-family: var(--sans);
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.85;
+    font-weight: 300;
+    padding: 0 0 1.4rem 0;
+    white-space: pre-line;
+}
+
+/* ── Portfolio ── */
+.portfolio-section {
+    background: var(--white);
+    padding: clamp(3rem, 6vw, 5rem) 0;
+}
+.portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3px;
+}
+@media (max-width: 575px) {
+    .portfolio-grid { grid-template-columns: repeat(2, 1fr); }
+}
+.portfolio-cell {
+    position: relative;
+    aspect-ratio: 3/4;
+    overflow: hidden;
+    cursor: pointer;
+    background: #e8ddd7;
+}
+.portfolio-cell:first-child {
+    grid-row: span 2;
+    aspect-ratio: unset;
+}
+.portfolio-cell img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s cubic-bezier(.22,.61,.36,1);
+}
+.portfolio-cell:hover img { transform: scale(1.05); }
+.portfolio-cell-overlay {
+    position: absolute; inset: 0;
+    background: rgba(26,18,15,0);
+    transition: background 0.35s;
+    display: flex; align-items: center; justify-content: center;
+}
+.portfolio-cell:hover .portfolio-cell-overlay {
+    background: rgba(26,18,15,0.28);
+}
+.portfolio-zoom-icon {
+    color: white;
+    font-size: 1.4rem;
+    opacity: 0;
+    transform: scale(0.7);
+    transition: opacity 0.3s, transform 0.3s;
+}
+.portfolio-cell:hover .portfolio-zoom-icon {
+    opacity: 1; transform: scale(1);
+}
+
+/* ── Lightbox ── */
+.lightbox-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(10,6,4,0.96);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.lightbox-overlay.open { display: flex; }
+.lightbox-img {
+    max-width: 90vw;
+    max-height: 90vh;
+    object-fit: contain;
+    display: block;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.9);
+}
+.lightbox-close {
+    position: absolute; top: 20px; right: 24px;
+    background: none; border: none;
+    color: rgba(255,255,255,0.6);
+    font-size: 1.5rem; cursor: pointer;
+    font-family: var(--sans);
+    letter-spacing: 2px;
+    transition: color 0.2s;
+}
+.lightbox-close:hover { color: white; }
+
+/* ── Carousel arrows ── */
+.custom-carousel-btn {
+    width: 36px !important;
+    background: none !important;
+    opacity: 0.45;
+    transition: opacity 0.3s;
+    z-index: 10;
+}
+.custom-carousel-btn:hover { opacity: 1; }
+.premium-arrow {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000000'%3e%3cpath fill-rule='evenodd' d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e") !important;
+    background-color: transparent !important;
+    width: 18px !important; height: 18px !important;
+}
+.carousel-control-prev-icon.premium-arrow { transform: rotate(180deg); }
+.group-hover-effect:hover .transition-scale { transform: scale(1.04); }
+</style>
+
+
+<!-- ══════════════════════════════════════════
+     SOBRE MÍ — editorial split layout
+     ══════════════════════════════════════════ -->
+<section id="sobre-mi">
+    <div class="about-wrap">
+
+        <!-- Foto -->
+        <div class="about-img-col reveal"
+             style="background-image: url('{{ global_config.imagen_sobre_mi if (global_config and global_config.imagen_sobre_mi) else 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&auto=format&fit=crop' }}'); background-size: cover; background-position: center;">
+            <div class="about-img-overlay"></div>
+        </div>
+
+        <!-- Texto -->
+        <div class="about-text-col reveal reveal-delay-1">
+            <span class="about-eyebrow">Sobre mí</span>
+            <h2 class="about-heading">¿Quién está<br>detrás de<br>Romina Bruera?</h2>
+            <p class="about-body">
+                Hola, soy Romina — maquilladora profesional de Córdoba Capital ✨<br><br>
+                Hace más de x años me dedico al mundo del maquillaje, capacitándome constantemente en maquillaje social, novias y perfeccionamientos profesionales.
+            </p>
+            <a href="{{ url_for('trayectoria') }}" class="btn-about">Ver mi trayectoria</a>
+        </div>
+
+    </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     BOOKING STRIP
+     ══════════════════════════════════════════ -->
+<div class="booking-strip reveal">
+    <span class="booking-strip-label">Agenda disponible · 2026</span>
+    <a href="{{ global_config.link_turno if (global_config and global_config.link_turno) else '#' }}" target="_blank">
+        Reservar cita
+    </a>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     SERVICIOS — carousel de 3
+     ══════════════════════════════════════════ -->
+<section id="servicios" class="catalog-section">
+    <div class="container">
+        <div class="sec-ornament reveal"><span class="sec-label">{{ global_config.sec_servicios }}</span></div>
+        <h2 class="sec-title reveal reveal-delay-1">{{ global_config.sec_servicios }}</h2>
+    </div>
+    <div class="catalog-carousel reveal reveal-delay-2" id="carousel-servicios">
+        <button class="catalog-arrow prev" id="prev-servicios" onclick="moveCarousel('servicios',-1)" aria-label="Anterior">&#8592;</button>
+        <div class="catalog-track-wrap">
+            <div class="catalog-grid" id="track-servicios">
+                {% if servicios %}
+                    {% for serv in servicios %}
+                    <a href="{{ url_for('servicio_detalle', id=serv.id) }}" class="catalog-item">
+                        <img src="{{ serv.imagen_principal }}" alt="{{ serv.tipo }}" loading="lazy">
+                        <div class="catalog-item-overlay">
+                            <div>
+                                <span class="catalog-item-name">{{ serv.tipo }}</span>
+                                <span class="catalog-item-sub">Ver detalle →</span>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-center text-muted fst-italic py-5 col-span-all">Próximamente</p>
+                {% endif %}
+            </div>
+        </div>
+        <button class="catalog-arrow next" id="next-servicios" onclick="moveCarousel('servicios',1)" aria-label="Siguiente">&#8594;</button>
+        <div class="catalog-dots" id="dots-servicios"></div>
+    </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     CURSOS — carousel de 3
+     ══════════════════════════════════════════ -->
+<section id="cursos" class="catalog-section alt">
+    <div class="container">
+        <div class="sec-ornament reveal"><span class="sec-label">{{ global_config.sec_cursos }}</span></div>
+        <h2 class="sec-title reveal reveal-delay-1">{{ global_config.sec_cursos }}</h2>
+    </div>
+    <div class="catalog-carousel reveal reveal-delay-2" id="carousel-cursos">
+        <button class="catalog-arrow prev" id="prev-cursos" onclick="moveCarousel('cursos',-1)" aria-label="Anterior">&#8592;</button>
+        <div class="catalog-track-wrap">
+            <div class="catalog-grid" id="track-cursos">
+                {% if cursos %}
+                    {% for curso in cursos %}
+                    <a href="{{ url_for('curso_detalle', id=curso.id) }}" class="catalog-item">
+                        <img src="{{ curso.imagen_principal }}" alt="{{ curso.nombre }}" loading="lazy">
+                        <div class="catalog-item-overlay">
+                            <div>
+                                <span class="catalog-item-name">{{ curso.nombre }}</span>
+                                <span class="catalog-item-sub">Ver detalle →</span>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-center text-muted fst-italic py-5">Próximamente</p>
+                {% endif %}
+            </div>
+        </div>
+        <button class="catalog-arrow next" id="next-cursos" onclick="moveCarousel('cursos',1)" aria-label="Siguiente">&#8594;</button>
+        <div class="catalog-dots" id="dots-cursos"></div>
+    </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     TESTIMONIOS — dark & centrado
+     ══════════════════════════════════════════ -->
+<section id="experiencias" class="testimonios-section">
+    <div class="container">
+        <div class="sec-ornament reveal" style="--gold: #b89d82;">
+            <span class="sec-label" style="color: var(--gold-light, #d4b99a);">{{ global_config.sec_testimonios }}</span>
+        </div>
+        <h2 class="sec-title reveal reveal-delay-1" style="color: #fff; margin-bottom: 3rem;">{{ global_config.sec_testimonios }}</h2>
+
+        <div id="carouselTestimonios" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                {% if experiencias %}
+                    {% for exp in experiencias %}
+                    <button type="button" data-bs-target="#carouselTestimonios" data-bs-slide-to="{{ loop.index0 }}"
+                            {% if loop.first %}class="active"{% endif %}></button>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            <div class="carousel-inner">
+                {% if experiencias %}
+                    {% for exp in experiencias %}
+                    <div class="carousel-item {% if loop.first %}active{% endif %}">
+                        <div class="testimonio-card reveal">
+                            <img src="{{ exp.foto_perfil }}" alt="{{ exp.nombre }}" class="testimonio-avatar">
+                            <p class="testimonio-quote">"{{ exp.testimonio }}"</p>
+                            <p class="testimonio-name">— {{ exp.nombre }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="carousel-item active">
+                        <p class="text-center fst-italic small py-3" style="color: rgba(255,255,255,0.4);">
+                            No hay testimonios cargados por el momento.
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+            <button class="carousel-control-prev custom-carousel-btn" type="button" data-bs-target="#carouselTestimonios" data-bs-slide="prev" style="left: 0;">
+                <span class="carousel-control-prev-icon premium-arrow" style="filter: invert(1);" aria-hidden="true"></span>
+            </button>
+            <button class="carousel-control-next custom-carousel-btn" type="button" data-bs-target="#carouselTestimonios" data-bs-slide="next" style="right: 0;">
+                <span class="carousel-control-next-icon premium-arrow" style="filter: invert(1);" aria-hidden="true"></span>
+            </button>
+        </div>
+    </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     FAQ — blush con acordeón propio
+     ══════════════════════════════════════════ -->
+<section id="preguntas-frecuentes" class="faq-section">
+    <div class="container" style="max-width: 720px;">
+        <div class="sec-ornament reveal"><span class="sec-label">{{ global_config.sec_faq }}</span></div>
+        <h2 class="sec-title reveal reveal-delay-1" style="margin-bottom: 3rem;">{{ global_config.sec_faq }}</h2>
+
+        {% if faqs %}
+            {% for faq in faqs %}
+            <div class="faq-item reveal" style="transition-delay: {{ loop.index0 * 0.07 }}s">
+                <button class="faq-btn" type="button"
+                        onclick="toggleFaq(this)"
+                        aria-expanded="false">
+                    <span class="faq-btn-text">{{ faq.pregunta }}</span>
+                    <span class="faq-icon">+</span>
+                </button>
+                <div class="faq-answer" style="display:none; max-height: 0; overflow: hidden; transition: max-height 0.4s ease;">
+                    {{ faq.respuesta }}
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-center fst-italic" style="color: var(--muted); font-family: var(--sans); font-size: 0.85rem;">
+                No hay preguntas cargadas por el momento.
+            </p>
+        {% endif %}
+    </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════
+     PORTFOLIO — mosaic editorial
+     ══════════════════════════════════════════ -->
+<section id="portfolio" class="portfolio-section">
+    <div class="container mb-4">
+        <div class="sec-ornament reveal"><span class="sec-label">Portfolio</span></div>
+        <h2 class="sec-title reveal reveal-delay-1">Portfolio</h2>
+    </div>
+
+    {% if galeria_general %}
+    <div class="portfolio-grid reveal reveal-delay-2">
+        {% for foto in galeria_general %}
+        <div class="portfolio-cell"
+             onclick="abrirLightboxGeneral('{{ foto.ruta }}')">
+            <img src="{{ foto.ruta }}"
+                 alt="Portfolio"
+                 loading="lazy"
+                 style="object-position: {{ foto.posicion_foco if foto.posicion_foco else '50% 50%' }};">
+            <div class="portfolio-cell-overlay">
+                <span class="portfolio-zoom-icon">+</span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <p class="text-center fst-italic py-5" style="color: var(--muted); font-family: var(--sans); font-size: 0.85rem;">
+            No hay fotos en el portfolio por el momento.
+        </p>
+    {% endif %}
+</section>
+
+
+<!-- Lightbox -->
+<div id="lightbox-general" class="lightbox-overlay" onclick="cerrarLightboxGeneral()">
+    <button class="lightbox-close" onclick="cerrarLightboxGeneral()">✕</button>
+    <img id="lightbox-general-img" src="" class="lightbox-img" onclick="event.stopPropagation()">
+</div>
+
+
+<script>
+/* ── Lightbox ── */
+function abrirLightboxGeneral(src) {
+    document.getElementById('lightbox-general-img').src = src;
+    document.getElementById('lightbox-general').classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+function cerrarLightboxGeneral() {
+    document.getElementById('lightbox-general').classList.remove('open');
+    document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') cerrarLightboxGeneral();
+});
+
+/* ── FAQ accordion propio ── */
+function toggleFaq(btn) {
+    const answer = btn.nextElementSibling;
+    const expanded = btn.getAttribute('aria-expanded') === 'true';
+
+    // Cerrar todos
+    document.querySelectorAll('.faq-btn').forEach(b => {
+        b.setAttribute('aria-expanded', 'false');
+        const a = b.nextElementSibling;
+        a.style.maxHeight = '0';
+        setTimeout(() => { if (b.getAttribute('aria-expanded') === 'false') a.style.display = 'none'; }, 380);
+    });
+
+    if (!expanded) {
+        btn.setAttribute('aria-expanded', 'true');
+        answer.style.display = 'block';
+        requestAnimationFrame(() => { answer.style.maxHeight = answer.scrollHeight + 'px'; });
+    }
+}
+
+/* ── Scroll reveal ── */
+const revealObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            revealObserver.unobserve(entry.target);
+        }
+    });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+/* ── Catalog Carousel ── */
+(function() {
+    function initCarousel(name) {
+        const track = document.getElementById('track-' + name);
+        const prevBtn = document.getElementById('prev-' + name);
+        const nextBtn = document.getElementById('next-' + name);
+        const dotsEl = document.getElementById('dots-' + name);
+        if (!track) return;
+
+        const items = track.querySelectorAll('.catalog-item');
+        if (!items.length) return;
+
+        // Items per page based on viewport
+        function perPage() {
+            if (window.innerWidth <= 480) return 1;
+            if (window.innerWidth <= 767) return 2;
+            return 3;
+        }
+
+        let current = 0;
+
+        function totalPages() {
+            return Math.ceil(items.length / perPage());
+        }
+
+        function buildDots() {
+            dotsEl.innerHTML = '';
+            const n = totalPages();
+            if (n <= 1) { dotsEl.style.display = 'none'; return; }
+            dotsEl.style.display = 'flex';
+            for (let i = 0; i < n; i++) {
+                const d = document.createElement('button');
+                d.className = 'catalog-dot' + (i === current ? ' active' : '');
+                d.setAttribute('aria-label', 'Página ' + (i + 1));
+                d.addEventListener('click', () => goTo(i));
+                dotsEl.appendChild(d);
+            }
+        }
+
+        function updateArrows() {
+            prevBtn.disabled = current === 0;
+            nextBtn.disabled = current >= totalPages() - 1;
+        }
+
+        function render() {
+            const pp = perPage();
+            const offset = current * pp * (100 / pp / (items.length / pp));
+            // translate by percentage of total track width
+            const pct = (current * pp * 100) / items.length;
+            track.style.transform = 'translateX(-' + pct + '%)';
+            buildDots();
+            updateArrows();
+        }
+
+        function goTo(page) {
+            current = Math.max(0, Math.min(page, totalPages() - 1));
+            render();
+        }
+
+        window['moveCarousel'] = window['moveCarousel'] || function(n, dir) {
+            // handled per-instance below
+        };
+
+        // Override per carousel
+        const prevHandler = () => goTo(current - 1);
+        const nextHandler = () => goTo(current + 1);
+        prevBtn.onclick = prevHandler;
+        nextBtn.onclick = nextHandler;
+
+        window.addEventListener('resize', () => { current = 0; render(); });
+        render();
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        initCarousel('servicios');
+        initCarousel('cursos');
+    });
+})();
+</script>
+{% endblock %}

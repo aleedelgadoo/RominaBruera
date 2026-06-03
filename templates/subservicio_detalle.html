@@ -1,0 +1,379 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- FRANJA NEGRA DE PUNTA A PUNTA (HERO SECTION) -->
+<div class="subservice-dark-hero">
+    <div class="container">
+        
+        <!-- Botón Volver (Estilizado para fondo oscuro) -->
+        <div class="pt-4 mb-5">
+            <a href="{{ url_for('servicio_detalle', id=subservicio.servicio.id) }}" class="btn-back-dark text-uppercase">
+                <span class="arrow">←</span> Regresar a {{ subservicio.servicio.tipo }}
+            </a>
+        </div>
+
+        <!-- Fusión Editorial: Imagen y Contenido en un solo bloque fluido -->
+        <div class="row g-5 align-items-center pb-5">
+            
+            <!-- Columna Izquierda: Imagen limpia y sin marcos pesados -->
+           <!-- Columna Izquierda: Imagen limpia y sin marcos pesados -->
+<div class="col-lg-5 col-md-6">
+    <div class="hero-image-container">
+        {% if subservicio.imagen_principal %}
+            <img src="{{ subservicio.imagen_principal }}" class="img-hero-fluid" alt="{{ subservicio.nombre }}" style="object-position: {{ subservicio.posicion_foco if subservicio.posicion_foco else '50% 50%' }};">
+        {% elif subservicio.fotos %}
+            <img src="{{ subservicio.fotos[0].ruta }}" class="img-hero-fluid" alt="{{ subservicio.nombre }}" style="object-position: {{ subservicio.fotos[0].posicion_foco if subservicio.fotos[0].posicion_foco else '50% 50%' }};">
+        {% else %}
+            <img src="{{ subservicio.servicio.imagen_principal }}" class="img-hero-fluid" alt="{{ subservicio.nombre }}">
+        {% endif %}
+    </div>
+</div>
+
+            <!-- Columna Derecha: Información, Tarifas Integradas y Acción -->
+            <div class="col-lg-7 col-md-6 ps-lg-5">
+                <div class="editorial-content">
+                    <span class="luxury-tag text-uppercase">Especialidad Premium</span>
+                    <h1 class="luxury-title text-uppercase">{{ subservicio.nombre }}</h1>
+                    <p class="service-parent-text text-uppercase tracking-widest text-white-50 mb-4">Línea: {{ subservicio.servicio.tipo }}</p>
+
+                    {% if subservicio.mostrar_duracion and subservicio.duracion %}
+                        <div class="mb-4">
+                            <span class="luxury-meta-badge-dark">⏱ Duración Estimada: {{ subservicio.duracion }}</span>
+                        </div>
+                    {% endif %}
+
+                    <div class="luxury-description-box mb-4">
+                        <p class="description-text text-white-50 mb-0">{{ subservicio.descripcion }}</p>
+                    </div>
+
+                    <!-- Tarifas con toggle -->
+                    {% if subservicio.mostrar_precio and subservicio.precios %}
+                    <div class="integrated-pricing mb-5">
+                        <button class="pricing-toggle-btn text-uppercase d-flex justify-content-between align-items-center w-100" 
+                                onclick="togglePrecios(this)" aria-expanded="false">
+                            <span class="pricing-header">Tarifas del Servicio</span>
+                            <span class="pricing-toggle-icon">＋</span>
+                        </button>
+                        <div class="pricing-lines" id="pricing-lines-box" style="display:none;">
+                            {% for pr in subservicio.precios %}
+                            <div class="pricing-line d-flex justify-content-between align-items-center py-2">
+                                <span class="price-desc text-white-50 text-uppercase small tracking-wider">{{ pr.descripcion if pr.descripcion else 'General' }}</span>
+                                <span class="price-amount text-white fw-medium">
+                                    {% if subservicio.tipo_precio == 'base' %}
+                                        ${{ pr.precio_base }}
+                                    {% else %}
+                                        ${{ pr.precio_desde }} - ${{ pr.precio_hasta }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Botón de Acción Fino e Inline (No bloque gigante) -->
+                    <div class="text-start">
+                        <a href="{{ global_config.link_turno }}" class="btn-luxury-stark text-uppercase">
+                            Agendar Turno Online
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- SECCIÓN PORTFOLIO (En fondo claro, idéntica a inicio.html) -->
+{% if subservicio.fotos %}
+<div class="container my-5 pt-4 animate-fade-in">
+    <div class="text-center mb-5">
+        <h2 class="portfolio-title-section text-uppercase">Portfolio</h2>
+        <p class="portfolio-subtitle-section text-uppercase">Galería de trabajos </p>
+        <div class="portfolio-divider"></div>
+    </div>
+
+    <!-- Grilla de Portfolio Impecable -->
+    <div class="row g-4 justify-content-center">
+        {% for foto in subservicio.fotos %}
+        <div class="col-12 col-sm-6 col-md-4">
+            <div class="portfolio-premium-card" onclick="abrirLightbox('{{ foto.ruta }}', '{{ foto.posicion_foco if foto.posicion_foco else '50% 50%' }}')" style="cursor:pointer;">
+                <div class="portfolio-img-container">
+                    <img src="{{ foto.ruta }}" 
+                         class="portfolio-main-img" 
+                         style="object-position: {{ foto.posicion_foco if foto.posicion_foco else '50% 50%' }};" 
+                         alt="Resultado {{ subservicio.nombre }}">
+                    <div class="portfolio-hover-overlay">
+                        <span class="portfolio-zoom-text text-uppercase tracking-widest">Ver Trabajo</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Lightbox -->
+    <div id="lightbox-overlay" onclick="cerrarLightbox()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:9999; align-items:center; justify-content:center; padding:20px;">
+        <button onclick="cerrarLightbox()" style="position:absolute; top:18px; right:22px; background:none; border:none; color:#fff; font-size:2rem; cursor:pointer; line-height:1;">✕</button>
+        <img id="lightbox-img" src="" style="max-width:90vw; max-height:88vh; object-fit:contain; display:block; box-shadow:0 20px 60px rgba(0,0,0,0.8);">
+    </div>
+</div>
+{% endif %}
+
+<style>
+    /* --- ROMPER CONTENEDOR PARA HACERLO DE PUNTA A PUNTA (FULL-WIDTH) --- */
+    .subservice-dark-hero {
+        background: #0d0d0d; /* Negro premium puro */
+        width: 100vw;
+        position: relative;
+        left: 50%;
+        right: 50%;
+        margin-left: -50vw;
+        margin-right: -50vw;
+        color: #ffffff;
+        box-shadow: inset 0 -10px 30px rgba(0,0,0,0.2);
+        animation: fadeIn 0.6s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Botón Volver en Modo Oscuro */
+    .btn-back-dark {
+        font-size: 0.75rem;
+        letter-spacing: 2px;
+        color: #888;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+        display: inline-block;
+    }
+    .btn-back-dark:hover { color: #b88b80; }
+    .btn-back-dark .arrow { display: inline-block; transition: transform 0.3s ease; }
+    .btn-back-dark:hover .arrow { transform: translateX(-4px); }
+
+    /* Contenedor e Imagen Principal */
+    .hero-image-container {
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+    .img-hero-fluid {
+        width: 100%;
+        height: auto;
+        max-height: 500px;
+        object-fit: cover;
+        display: block;
+    }
+
+    /* Tipografías Editoriales */
+    .luxury-tag {
+        font-size: 0.65rem;
+        letter-spacing: 4px;
+        color: #b88b80;
+        font-weight: 700;
+        display: block;
+    }
+    .luxury-title {
+        font-family: 'Playfair Display', 'Didot', Georgia, serif;
+        font-size: 2.6rem;
+        font-weight: 400;
+        letter-spacing: 1px;
+        line-height: 1.2;
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+    .service-parent-text {
+        font-size: 0.75rem;
+        letter-spacing: 2px;
+    }
+    
+    .luxury-meta-badge-dark {
+        display: inline-block;
+        background: #1a1a1a;
+        border: 1px solid #2a2a2a;
+        padding: 6px 16px;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+        color: #ccc;
+    }
+
+    .luxury-description-box {
+        border-left: 1px solid #b88b80;
+        padding-left: 20px;
+    }
+    .description-text {
+        line-height: 1.8;
+        font-size: 1rem;
+        white-space: pre-line;
+    }
+
+    /* Líneas de tarifas minimalistas e integradas */
+    .integrated-pricing {
+        border-top: 1px solid rgba(255,255,255,0.08);
+        padding-top: 15px;
+    }
+    .pricing-header {
+        font-size: 0.7rem;
+        letter-spacing: 2px;
+        color: #b88b80;
+        font-weight: 600;
+    }
+    .pricing-line {
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .pricing-line:last-child {
+        border-bottom: none;
+    }
+    .price-amount {
+        letter-spacing: 0.5px;
+    }
+
+    /* Botón Stark Premium (Sofisticado, sin verse tosco) */
+    .btn-luxury-stark {
+        display: inline-block;
+        background: #ffffff;
+        color: #0d0d0d;
+        text-decoration: none;
+        padding: 14px 45px;
+        font-size: 0.8rem;
+        letter-spacing: 2.5px;
+        font-weight: 700;
+        transition: all 0.3s ease;
+        border: 1px solid #ffffff;
+    }
+    .btn-luxury-stark:hover {
+        background: transparent;
+        color: #ffffff;
+        border-color: #b88b80;
+        transform: translateY(-2px);
+    }
+
+    /* --- ESTILOS DEL PORTFOLIO (Fondo Claro) --- */
+    .portfolio-title-section {
+        font-family: 'Playfair Display', 'Didot', Georgia, serif;
+        font-size: 1.8rem;
+        color: #111;
+        letter-spacing: 2px;
+        margin-bottom: 4px;
+    }
+    .portfolio-subtitle-section {
+        font-size: 0.7rem;
+        letter-spacing: 3px;
+        color: #a67c72;
+    }
+    .portfolio-divider {
+        width: 40px;
+        height: 1px;
+        background: #eac8be;
+        margin: 15px auto 0;
+    }
+
+    .portfolio-premium-card {
+        background: #fff;
+        border: 1px solid #f2eae7;
+        padding: 6px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+        transition: transform 0.4s ease, box-shadow 0.4s ease;
+    }
+    .portfolio-img-container {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 3/4;
+        overflow: hidden;
+    }
+    .portfolio-main-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+    
+    .portfolio-hover-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(13, 13, 13, 0.85);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+    .portfolio-zoom-text {
+        font-size: 0.7rem;
+        color: #ffffff;
+        border-bottom: 1px solid #b88b80;
+        padding-bottom: 4px;
+    }
+
+    .portfolio-premium-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08);
+    }
+    .portfolio-premium-card:hover .portfolio-main-img {
+        transform: scale(1.04);
+    }
+    .portfolio-premium-card:hover .portfolio-hover-overlay {
+        opacity: 1;
+    }
+
+    /* Toggle pricing */
+    .pricing-toggle-btn {
+        background: none;
+        border: none;
+        border-top: 1px solid rgba(255,255,255,0.08);
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        padding: 12px 0;
+        cursor: pointer;
+        width: 100%;
+        text-align: left;
+        transition: opacity 0.2s;
+    }
+    .pricing-toggle-btn:hover { opacity: 0.8; }
+    .pricing-toggle-icon {
+        font-size: 1.2rem;
+        color: #b88b80;
+        transition: transform 0.3s ease;
+        line-height: 1;
+    }
+    .pricing-toggle-btn[aria-expanded="true"] .pricing-toggle-icon {
+        transform: rotate(45deg);
+    }
+    #pricing-lines-box {
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+        padding-bottom: 4px;
+    }
+
+    /* Lightbox */
+    #lightbox-overlay { display: none; }
+    #lightbox-overlay.active { display: flex !important; }
+</style>
+
+<script>
+function togglePrecios(btn) {
+    const box = document.getElementById('pricing-lines-box');
+    const expanded = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', !expanded);
+    box.style.display = expanded ? 'none' : 'block';
+}
+
+function abrirLightbox(src, foco) {
+    const overlay = document.getElementById('lightbox-overlay');
+    const img = document.getElementById('lightbox-img');
+    img.src = src;
+    img.style.objectPosition = foco;
+    overlay.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+function cerrarLightbox() {
+    document.getElementById('lightbox-overlay').style.display = 'none';
+    document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') cerrarLightbox();
+});
+</script>
+
+{% endblock %}
