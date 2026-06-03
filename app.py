@@ -419,6 +419,20 @@ def nuevo_servicio():
     else:
         flash('Debés subir una imagen principal.', 'danger')
     return redirect(url_for('admin_dashboard'))
+
+@app.route('/setup-admin-secreto-xyz')
+def setup_admin():
+    from werkzeug.security import generate_password_hash
+    user = os.environ.get('ADMIN_USER')
+    pwd  = os.environ.get('ADMIN_PASSWORD')
+    if not user or not pwd:
+        return 'Faltan variables ADMIN_USER o ADMIN_PASSWORD', 500
+    if Admin.query.filter_by(username=user).first():
+        return 'El admin ya existe', 200
+    hashed = generate_password_hash(pwd, method='pbkdf2:sha256')
+    db.session.add(Admin(username=user, password=hashed))
+    db.session.commit()
+    return f'Admin "{user}" creado correctamente ✅', 200
  
 @app.route('/admin/servicio/editar/<int:id>', methods=['POST'])
 @login_required
