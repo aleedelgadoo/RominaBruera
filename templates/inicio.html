@@ -899,10 +899,12 @@ document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
         function render() {
             const pp = perPage();
-            const offset = current * pp * (100 / pp / (items.length / pp));
-            // translate by percentage of total track width
-            const pct = (current * pp * 100) / items.length;
-            track.style.transform = 'translateX(-' + pct + '%)';
+            const itemWidth = items[0].getBoundingClientRect().width;
+            // Calcular el máximo desplazamiento posible para no mostrar espacio vacío
+            const maxOffset = (items.length - pp) * itemWidth;
+            const rawOffset = current * pp * itemWidth;
+            const px = Math.min(rawOffset, Math.max(0, maxOffset));
+            track.style.transform = 'translateX(-' + px + 'px)';
             buildDots();
             updateArrows();
         }
