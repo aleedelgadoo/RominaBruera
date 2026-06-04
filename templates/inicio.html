@@ -246,7 +246,6 @@
 .catalog-carousel {
     position: relative;
     margin-top: 2.5rem;
-    overflow: hidden;
 }
 .catalog-track-wrap {
     overflow: hidden;
@@ -322,27 +321,26 @@
 .catalog-item:hover .catalog-item-sub { opacity: 1; transform: none; }
 
 /* Flechas del carousel */
-.catalog-arrow {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 10;
-    background: rgba(26,18,15,0.55);
-    border: 1px solid rgba(184,157,130,0.4);
-    color: var(--white);
-    width: 40px; height: 40px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    transition: background 0.3s, opacity 0.3s, border-color 0.3s;
-    opacity: 0.7;
-    font-size: 0.9rem;
-    line-height: 1;
+.catalog-nav-controls {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 15px;
 }
-.catalog-arrow:hover { background: rgba(184,157,130,0.85); border-color: var(--gold); opacity: 1; }
-.catalog-arrow.prev { left: 12px; }
-.catalog-arrow.next { right: 12px; }
-.catalog-arrow:disabled { opacity: 0.2; cursor: default; pointer-events: none; }
+.catalog-arrow {
+    background: transparent;
+    border: 1px solid #eae1dc;
+    color: #111;
+    width: 45px; height: 45px;
+    border-radius: 50%;
+    font-size: 1.1rem;
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+.catalog-arrow:hover { background: #111; color: #fff; border-color: #111; transform: translateY(-2px); }
+.catalog-arrow:active { transform: translateY(0); }
+.catalog-arrow:disabled { opacity: 0.25; cursor: default; pointer-events: none; }
 
 /* Dots */
 .catalog-dots {
@@ -622,9 +620,12 @@
     <div class="container">
         <div class="sec-ornament reveal"><span class="sec-label">{{ global_config.sec_servicios }}</span></div>
         <h2 class="sec-title reveal reveal-delay-1">{{ global_config.sec_servicios }}</h2>
+        <div class="catalog-nav-controls reveal reveal-delay-2">
+            <button class="catalog-arrow" id="prev-servicios" aria-label="Anterior">&#8592;</button>
+            <button class="catalog-arrow" id="next-servicios" aria-label="Siguiente">&#8594;</button>
+        </div>
     </div>
     <div class="catalog-carousel reveal reveal-delay-2" id="carousel-servicios">
-        <button class="catalog-arrow prev" id="prev-servicios" onclick="moveCarousel('servicios',-1)" aria-label="Anterior">&#8592;</button>
         <div class="catalog-track-wrap">
             <div class="catalog-grid" id="track-servicios">
                 {% if servicios %}
@@ -644,7 +645,6 @@
                 {% endif %}
             </div>
         </div>
-        <button class="catalog-arrow next" id="next-servicios" onclick="moveCarousel('servicios',1)" aria-label="Siguiente">&#8594;</button>
         <div class="catalog-dots" id="dots-servicios"></div>
     </div>
 </section>
@@ -657,9 +657,12 @@
     <div class="container">
         <div class="sec-ornament reveal"><span class="sec-label">{{ global_config.sec_cursos }}</span></div>
         <h2 class="sec-title reveal reveal-delay-1">{{ global_config.sec_cursos }}</h2>
+        <div class="catalog-nav-controls reveal reveal-delay-2">
+            <button class="catalog-arrow" id="prev-cursos" aria-label="Anterior">&#8592;</button>
+            <button class="catalog-arrow" id="next-cursos" aria-label="Siguiente">&#8594;</button>
+        </div>
     </div>
     <div class="catalog-carousel reveal reveal-delay-2" id="carousel-cursos">
-        <button class="catalog-arrow prev" id="prev-cursos" onclick="moveCarousel('cursos',-1)" aria-label="Anterior">&#8592;</button>
         <div class="catalog-track-wrap">
             <div class="catalog-grid" id="track-cursos">
                 {% if cursos %}
@@ -679,7 +682,6 @@
                 {% endif %}
             </div>
         </div>
-        <button class="catalog-arrow next" id="next-cursos" onclick="moveCarousel('cursos',1)" aria-label="Siguiente">&#8594;</button>
         <div class="catalog-dots" id="dots-cursos"></div>
     </div>
 </section>
